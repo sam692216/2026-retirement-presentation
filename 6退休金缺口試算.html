@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>退休金缺口試算 | 阿福教練</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  :root{
+    --ink:#1B3A5C;      /* 深藍 - 信任/穩健 */
+    --ink-deep:#122841;
+    --gold:#C89B3C;     /* 琥珀金 - 累積財富 */
+    --gold-soft:#EADFC2;
+    --paper:#F7F5F1;    /* 米白紙感底色 */
+    --white:#FFFFFF;
+    --line:#E4DFD4;
+    --good:#3E6B54;     /* 墨綠 - 充足 */
+    --ok:#8A9A3B;       /* 黃綠 - 接近 */
+    --warn:#D97A3D;     /* 暖橘 - 有缺口 */
+    --bad:#B34A3C;      /* 磚紅 - 缺口大 */
+    --text:#2A2F36;
+    --muted:#6B7280;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--text);font-family:"Noto Sans TC",sans-serif;-webkit-font-smoothing:antialiased;}
+  .serif{font-family:"Noto Serif TC",serif;}
+  #app{max-width:720px;margin:0 auto;padding:20px 16px 48px;}
+
+  .hero{
+    background:linear-gradient(160deg,var(--ink) 0%,var(--ink-deep) 100%);
+    color:#fff;border-radius:20px;padding:28px 22px 24px;position:relative;overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;
+    background:radial-gradient(circle, rgba(200,155,60,.35) 0%, rgba(200,155,60,0) 70%);
+  }
+  .eyebrow{font-size:12px;letter-spacing:.14em;color:var(--gold);font-weight:700;text-transform:uppercase;}
+  .hero h1{font-size:24px;line-height:1.4;margin:8px 0 6px;font-weight:700;}
+  .hero p{font-size:13px;color:#CBD5E1;margin:0;line-height:1.7;}
+
+  .card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:20px 18px;margin-top:16px;}
+  .step-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;}
+  .step-num{font-family:"Noto Serif TC",serif;font-size:22px;font-weight:700;color:var(--gold);}
+  .step-title{font-size:16px;font-weight:700;color:var(--ink);}
+  .step-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+  label.field{display:block;margin-bottom:14px;}
+  label.field:last-child{margin-bottom:0;}
+  .field-label{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--text);margin-bottom:6px;font-weight:500;}
+  .field-hint{font-size:11px;color:var(--muted);font-weight:400;}
+  input[type=number], input[type=text]{
+    width:100%;padding:11px 12px;border:1px solid #D8D2C4;border-radius:10px;font-size:15px;
+    background:#FCFBF9;color:var(--text);font-family:"Noto Sans TC",sans-serif;
+  }
+  input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,155,60,.15);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  .seg{display:flex;background:#F1EEE7;border-radius:10px;padding:3px;margin-bottom:14px;}
+  .seg button{flex:1;border:none;background:transparent;padding:9px 6px;border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;font-weight:500;}
+  .seg button.active{background:var(--ink);color:#fff;}
+
+  .slider-row{display:flex;align-items:center;gap:10px;}
+  input[type=range]{flex:1;accent-color:var(--gold);}
+  .slider-val{min-width:52px;text-align:right;font-weight:700;color:var(--ink);font-size:14px;}
+
+  .btn-primary{
+    width:100%;background:var(--ink);color:#fff;border:none;padding:15px;border-radius:12px;
+    font-size:16px;font-weight:700;cursor:pointer;margin-top:18px;font-family:inherit;
+    transition:transform .1s ease, background .15s ease;
+  }
+  .btn-primary:active{transform:scale(.98);}
+  .btn-primary:hover{background:var(--ink-deep);}
+
+  /* Result */
+  .result-hero{background:var(--ink);border-radius:18px;padding:24px 20px;color:#fff;text-align:center;margin-top:20px;}
+  .result-tag{display:inline-block;padding:5px 14px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:10px;}
+  .result-num{font-family:"Noto Serif TC",serif;font-size:38px;font-weight:900;line-height:1.15;}
+  .result-num span{font-size:16px;font-weight:500;margin-left:4px;}
+  .result-desc{font-size:13px;color:#CBD5E1;margin-top:8px;line-height:1.6;}
+
+  .tower{margin-top:18px;}
+  .tower-bar{display:flex;height:34px;border-radius:8px;overflow:hidden;border:1px solid var(--line);}
+  .tower-seg{display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700;white-space:nowrap;overflow:hidden;}
+  .tower-target{position:relative;height:14px;margin-top:6px;}
+  .tower-target-line{position:absolute;top:0;bottom:0;width:2px;background:var(--ink);}
+  .tower-target-label{position:absolute;top:16px;font-size:10px;color:var(--ink);font-weight:700;transform:translateX(-50%);white-space:nowrap;}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px;font-size:12px;color:var(--text);}
+  .legend-item{display:flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block;}
+
+  .breakdown{margin-top:18px;}
+  .bd-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
+  .bd-row:last-child{border-bottom:none;}
+  .bd-name{font-size:13px;color:var(--text);font-weight:500;}
+  .bd-note{font-size:11px;color:var(--muted);margin-top:2px;}
+  .bd-num{font-size:15px;font-weight:700;color:var(--ink);}
+
+  .advice{background:var(--gold-soft);border-radius:14px;padding:16px 18px;margin-top:18px;}
+  .advice-title{font-size:13px;font-weight:700;color:var(--ink-deep);margin-bottom:6px;}
+  .advice-text{font-size:13px;color:#4A4030;line-height:1.8;}
+
+  .cta{margin-top:18px;display:flex;flex-direction:column;gap:10px;}
+  .cta-survey{
+    display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg, #FBBF24 0%, #D97706 100%);color:#1E293B;
+    padding:14px;border-radius:12px;font-weight:800;font-size:15px;text-decoration:none;box-shadow: 0 4px 14px rgba(217, 119, 6, 0.25);
+    transition: transform .1s ease, filter .15s ease;
+  }
+  .cta-survey:hover{filter: brightness(1.05); transform: translateY(-1px);}
+  .cta-line{
+    display:flex;align-items:center;justify-content:center;gap:8px;background:#06C755;color:#fff;
+    padding:14px;border-radius:12px;font-weight:700;font-size:15px;text-decoration:none;
+  }
+  .cta-copy{
+    display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:var(--ink);
+    border:1px solid var(--ink);padding:13px;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;
+  }
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink-deep);color:#fff;
+    padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:50;
+  }
+  .toast.show{opacity:1;}
+
+  .foot-note{font-size:11px;color:var(--muted);text-align:center;margin-top:22px;line-height:1.8;}
+  .advance-toggle{font-size:12px;color:var(--ink);text-decoration:underline;cursor:pointer;text-align:center;margin-top:10px;}
+  .advance-panel{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
+
+  @media (max-width:420px){
+    .hero h1{font-size:20px;}
+    .result-num{font-size:32px;}
+    .row2{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="hero">
+    <div class="eyebrow">退休金規劃 · 缺口試算</div>
+    <h1 class="serif">你的退休金，夠不夠用？</h1>
+    <p>結合勞保老年年金、勞退新制個人專戶、國民年金三大來源，試算每月可領金額，找出與理想退休生活的差距。</p>
+  </div>
+
+  <!-- 01 基本資料 -->
+  <div class="card">
+    <div class="step-head">
+      <span class="step-num serif">01</span>
+      <div>
+        <div class="step-title">基本資料</div>
+        <div class="step-sub">用來計算年資與距離退休的時間</div>
+      </div>
+    </div>
+    <div class="row2">
+      <label class="field">
+        <div class="field-label">目前年齡</div>
+        <input type="number" v-model.number="f.age" min="18" max="70">
+      </label>
+      <label class="field">
+        <div class="field-label">預計退休年齡</div>
+        <input type="number" v-model.number="f.retireAge" min="60" max="70">
+      </label>
+    </div>
+    <label class="field" style="margin-top:14px;">
+      <div class="field-label">目前月薪（稅前）<span class="field-hint">用於估算勞退提繳與目標生活費</span></div>
+      <input type="number" v-model.number="f.salary" step="1000">
+    </label>
+  </div>
+
+  <!-- 02 勞保 -->
+  <div class="card">
+    <div class="step-head">
+      <span class="step-num serif">02</span>
+      <div>
+        <div class="step-title">勞保老年年金</div>
+        <div class="step-sub">2026年投保薪資級距為 29,500 ~ 45,800 元</div>
+      </div>
+    </div>
+    <div class="row2">
+      <label class="field">
+        <div class="field-label">平均月投保薪資</div>
+        <input type="number" v-model.number="f.laborInsSalary" step="1000">
+      </label>
+      <label class="field">
+        <div class="field-label">已有勞保年資（年）</div>
+        <input type="number" v-model.number="f.laborInsYears" step="1">
+      </label>
+    </div>
+  </div>
+
+  <!-- 03 勞退新制 -->
+  <div class="card">
+    <div class="step-head">
+      <span class="step-num serif">03</span>
+      <div>
+        <div class="step-title">勞退新制（個人退休金專戶）</div>
+        <div class="step-sub">雇主至少提繳 6%，可自行加碼提撥</div>
+      </div>
+    </div>
+    <div class="seg">
+      <button :class="{active: f.workerType==='employee'}" @click="f.workerType='employee'">受僱勞工（公司投保）</button>
+      <button :class="{active: f.workerType==='union'}" @click="f.workerType='union'">職業工會加保（無雇主）</button>
+    </div>
+    <div class="bd-note" style="margin:-6px 0 14px;">
+      {{ f.workerType==='employee' ? '公司必須每月提繳至少 6%，員工可自行加碼提撥。' : '沒有雇主，勞退局不會有人幫你提繳 6%，這一塊完全要靠「自願提繳」才會累積，沒提繳就是 0。' }}
+    </div>
+    <label class="field">
+      <div class="field-label">目前專戶已累積金額<span class="field-hint">沒有可留 0</span></div>
+      <input type="number" v-model.number="f.laborPensionBalance" step="10000">
+    </label>
+    <label class="field" style="margin-top:14px;">
+      <div class="field-label">{{ f.workerType==='employee' ? '自提比例（除雇主 6% 外）' : '自願提繳比例（無雇主提繳，靠這個才有累積）' }}<span class="field-hint">{{f.selfContribute}}%</span></div>
+      <div class="slider-row">
+        <input type="range" v-model.number="f.selfContribute" min="0" max="6" step="1">
+        <span class="slider-val">{{f.selfContribute}}%</span>
+      </div>
+    </label>
+  </div>
+
+
+  <!-- 04 國民年金 -->
+  <div class="card">
+    <div class="step-head">
+      <span class="step-num serif">04</span>
+      <div>
+        <div class="step-title">國民年金</div>
+        <div class="step-sub">未參加勞保、公教保等期間的年資</div>
+      </div>
+    </div>
+    <label class="field">
+      <div class="field-label">國民年金加保年資（年）<span class="field-hint">沒有可留 0</span></div>
+      <input type="number" v-model.number="f.natPensionYears" step="1">
+    </label>
+  </div>
+
+  <!-- 05 退休需求 -->
+  <div class="card">
+    <div class="step-head">
+      <span class="step-num serif">05</span>
+      <div>
+        <div class="step-title">退休後理想生活費</div>
+        <div class="step-sub">預設用薪資替代率估算，也可以自行輸入</div>
+      </div>
+    </div>
+    <div class="seg">
+      <button :class="{active: f.goalMode==='rate'}" @click="f.goalMode='rate'">用替代率估算</button>
+      <button :class="{active: f.goalMode==='manual'}" @click="f.goalMode='manual'">自己輸入金額</button>
+    </div>
+
+    <div v-if="f.goalMode==='rate'">
+      <label class="field">
+        <div class="field-label">薪資替代率<span class="field-hint">{{f.replaceRate}}%</span></div>
+        <div class="slider-row">
+          <input type="range" v-model.number="f.replaceRate" min="40" max="100" step="5">
+          <span class="slider-val">{{f.replaceRate}}%</span>
+        </div>
+      </label>
+      <div class="bd-note" style="margin-top:-6px;">建議每月生活費約 {{ fmt(goalFromRate) }} 元（目前月薪 × 替代率）</div>
+    </div>
+    <div v-else>
+      <label class="field">
+        <div class="field-label">預計退休後每月生活費</div>
+        <input type="number" v-model.number="f.goalManual" step="1000">
+      </label>
+    </div>
+
+    <div class="advance-toggle" @click="showAdvanced=!showAdvanced">{{ showAdvanced ? '收合進階設定 ▲' : '進階設定（利率 / 生命表 / 國保金額）▼' }}</div>
+    <div class="advance-panel" v-if="showAdvanced">
+      <label class="field">
+        <div class="field-label">勞退基金預期年化報酬率<span class="field-hint">{{f.rate}}%</span></div>
+        <div class="slider-row">
+          <input type="range" v-model.number="f.rate" min="0" max="6" step="0.5">
+          <span class="slider-val">{{f.rate}}%</span>
+        </div>
+      </label>
+      <label class="field" style="margin-top:14px;">
+        <div class="field-label">退休後平均餘命<span class="field-hint">{{f.lifeYears}} 年，用於將專戶總額換算成月退休金</span></div>
+        <div class="slider-row">
+          <input type="range" v-model.number="f.lifeYears" min="10" max="30" step="1">
+          <span class="slider-val">{{f.lifeYears}} 年</span>
+        </div>
+      </label>
+      <div class="row2" style="margin-top:14px;">
+        <label class="field">
+          <div class="field-label">國保月投保金額<span class="field-hint">2026現行值</span></div>
+          <input type="number" v-model.number="f.natPensionBase" step="100">
+        </label>
+        <label class="field">
+          <div class="field-label">國保保底加計金額<span class="field-hint">現行值</span></div>
+          <input type="number" v-model.number="f.natPensionAddon" step="10">
+        </label>
+      </div>
+    </div>
+
+    <button class="btn-primary" @click="calculate">開始試算</button>
+  </div>
+
+  <!-- 結果 -->
+  <div v-if="result">
+
+    <div class="result-hero">
+      <span class="result-tag" :style="{background: grade.color}">{{ grade.label }}</span>
+      <div class="result-num">{{ result.gap > 0 ? '每月缺口' : '每月結餘' }}<br>{{ fmt(Math.abs(result.gap)) }}<span>元</span></div>
+      <div class="result-desc">
+        三大來源預估每月可領 {{ fmt(result.total) }} 元，理想生活費 {{ fmt(result.goal) }} 元，
+        退休準備度 {{ result.readiness }}%
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="step-title" style="margin-bottom:14px;">退休金結構</div>
+      <div class="tower">
+        <div class="tower-bar">
+          <div class="tower-seg" v-for="s in stackSegments" :key="s.name" :style="{width: s.pct+'%', background: s.color}">
+            <span v-if="s.pct > 10">{{s.name}}</span>
+          </div>
+        </div>
+        <div class="tower-target" :style="{width: towerWidthPct + '%'}">
+          <div class="tower-target-line" :style="{left: targetLinePct + '%'}"></div>
+          <div class="tower-target-label" :style="{left: targetLinePct + '%'}">目標 {{ fmt(result.goal) }}</div>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="dot" style="background:#1B3A5C"></span>勞保 {{ fmt(result.labor) }}</div>
+        <div class="legend-item"><span class="dot" style="background:#C89B3C"></span>勞退 {{ fmt(result.pension) }}</div>
+        <div class="legend-item"><span class="dot" style="background:#8A9A3B"></span>國保 {{ fmt(result.nat) }}</div>
+      </div>
+
+      <div class="breakdown">
+        <div class="bd-row">
+          <div>
+            <div class="bd-name">勞保老年年金</div>
+            <div class="bd-note">年資 {{f.laborInsYears}} 年，65歲請領基準</div>
+          </div>
+          <div class="bd-num">{{ fmt(result.labor) }}</div>
+        </div>
+        <div class="bd-row">
+          <div>
+            <div class="bd-name">勞退新制月退休金</div>
+            <div class="bd-note">{{ f.workerType==='employee' ? '雇主6% + ' : '無雇主提繳，僅' }}自提{{f.selfContribute}}%，依{{f.lifeYears}}年平均餘命換算</div>
+          </div>
+          <div class="bd-num">{{ fmt(result.pension) }}</div>
+        </div>
+        <div class="bd-row">
+          <div>
+            <div class="bd-name">國民年金</div>
+            <div class="bd-note">年資 {{f.natPensionYears}} 年</div>
+          </div>
+          <div class="bd-num">{{ fmt(result.nat) }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="advice">
+      <div class="advice-title">📌 給你的建議</div>
+      <div class="advice-text">{{ adviceText }}</div>
+    </div>
+
+    <div class="cta">
+      <a class="cta-survey" href="https://reurl.cc/NO4Qge" target="_blank" rel="noopener">📝 立即填寫：退休金問卷（專屬客製諮詢）</a>
+      <a class="cta-line" :href="lineUrl" target="_blank" rel="noopener">加 LINE 找阿福教練，免費規劃缺口補足方案</a>
+      <button class="cta-copy" @click="copySummary">📋 複製試算結果，傳給我看看</button>
+    </div>
+  </div>
+
+  <div class="foot-note">
+    本試算採簡化公式估算，僅供教育與規劃參考，實際給付金額以勞動部勞工保險局、勞退局公告為準。<br>
+    國民年金保底加計金額與投保金額可能隨政策調整，請留意最新公告。
+  </div>
+
+</div>
+
+<div class="toast" :class="{show: toastShow}">{{ toastMsg }}</div>
+
+<script>
+const { createApp } = Vue;
+
+createApp({
+  data(){
+    return {
+      f: {
+        age: 40,
+        retireAge: 65,
+        salary: 50000,
+        laborInsSalary: 45800,
+        laborInsYears: 15,
+        laborPensionBalance: 300000,
+        workerType: 'employee',
+        selfContribute: 0,
+        natPensionYears: 0,
+        goalMode: 'rate',
+        replaceRate: 70,
+        goalManual: 35000,
+        rate: 3,
+        lifeYears: 20,
+        natPensionBase: 21103,
+        natPensionAddon: 4049
+      },
+      showAdvanced: false,
+      result: null,
+      toastShow: false,
+      toastMsg: '',
+      lineUrl: 'https://lin.ee/請替換成你的LINE官方帳號連結'
+    }
+  },
+  computed: {
+    goalFromRate(){
+      return Math.round((this.f.salary || 0) * (this.f.replaceRate/100));
+    },
+    grade(){
+      if(!this.result) return {label:'', color:''};
+      const r = this.result.readiness;
+      if(r >= 100) return {label:'準備充足', color:'#3E6B54'};
+      if(r >= 80) return {label:'接近目標', color:'#8A9A3B'};
+      if(r >= 50) return {label:'尚有缺口', color:'#D97A3D'};
+      return {label:'缺口顯著', color:'#B34A3C'};
+    },
+    stackSegments(){
+      if(!this.result) return [];
+      const total = this.result.total || 1;
+      return [
+        {name:'勞保', pct: this.result.labor/total*100, color:'#1B3A5C'},
+        {name:'勞退', pct: this.result.pension/total*100, color:'#C89B3C'},
+        {name:'國保', pct: this.result.nat/total*100, color:'#8A9A3B'},
+      ].filter(s => s.pct > 0.5);
+    },
+    towerWidthPct(){
+      // width of the target-line track relative to bar, scaled so target marker
+      // can exceed 100% (meaning goal is higher than current total)
+      if(!this.result) return 100;
+      return 100;
+    },
+    targetLinePct(){
+      if(!this.result) return 100;
+      const pct = (this.result.goal / this.result.total) * 100;
+      return Math.min(pct, 100);
+    },
+    adviceText(){
+      if(!this.result) return '';
+      const gap = this.result.gap;
+      if(gap <= 0){
+        return '目前試算結果顯示退休金已能覆蓋理想生活費，恭喜你打下不錯的基礎！接下來可以思考如何用保單或投資工具，讓退休生活更從容、更有餘裕，或補強長照與醫療風險缺口。';
+      }
+      const years = Math.max(this.f.retireAge - this.f.age, 1);
+      return `每月大約還有 ${this.fmt(gap)} 元的缺口，距離退休還有 ${years} 年可以準備。透過年金保險、儲蓄型保單或增加勞退自提比例，都是常見的補足方式，實際規劃建議依你的風險屬性與現金流量身打造。`;
+    }
+  },
+  methods:{
+    fmt(n){
+      if(n === undefined || n === null || isNaN(n)) return '0';
+      return Math.round(n).toLocaleString('zh-TW');
+    },
+    calcLaborInsurance(){
+      const salaryBase = Math.min(Math.max(this.f.laborInsSalary || 0, 0), 45800);
+      const years = this.f.laborInsYears || 0;
+      const a = salaryBase * years * 0.00775 + 3000;
+      const b = salaryBase * years * 0.0155;
+      let monthly = Math.max(a, b, 0);
+      // 請領年齡調整：65歲為基準，每早1年-4%(最多-20%)，每晚1年+4%(最多+20%)
+      const diff = Math.min(Math.max(this.f.retireAge - 65, -5), 5);
+      const factor = 1 + diff * 0.04;
+      monthly = years > 0 ? monthly * factor : 0;
+      return Math.max(monthly, 0);
+    },
+    calcLaborPension(){
+      const monthlyBase = Math.min(Math.max(this.f.salary || 0, 0), 45800);
+      const employerRate = this.f.workerType === 'union' ? 0 : 0.06;
+      const contributeRate = employerRate + (this.f.selfContribute || 0)/100;
+      const monthlyContribution = monthlyBase * contributeRate;
+      const months = Math.max((this.f.retireAge - this.f.age) * 12, 0);
+      const r = (this.f.rate || 0) / 100 / 12;
+      const principal = this.f.laborPensionBalance || 0;
+      let fv;
+      if(r === 0){
+        fv = principal + monthlyContribution * months;
+      } else {
+        fv = principal * Math.pow(1+r, months) + monthlyContribution * ((Math.pow(1+r, months) - 1) / r);
+      }
+      const lifeMonths = Math.max((this.f.lifeYears || 20) * 12, 1);
+      return fv / lifeMonths;
+    },
+    calcNationalPension(){
+      const base = this.f.natPensionBase || 0;
+      const years = this.f.natPensionYears || 0;
+      const addon = this.f.natPensionAddon || 0;
+      const a = base * years * 0.0065 + addon;
+      const b = base * years * 0.013;
+      return years > 0 ? Math.max(a, b, 0) : 0;
+    },
+    calculate(){
+      const labor = this.calcLaborInsurance();
+      const pension = this.calcLaborPension();
+      const nat = this.calcNationalPension();
+      const total = labor + pension + nat;
+      const goal = this.f.goalMode === 'rate' ? this.goalFromRate : (this.f.goalManual || 0);
+      const gap = goal - total;
+      const readiness = goal > 0 ? Math.round((total/goal)*100) : 0;
+      this.result = { labor, pension, nat, total, goal, gap, readiness };
+      this.save();
+      this.$nextTick(() => this.reportHeight());
+    },
+    copySummary(){
+      if(!this.result) return;
+      const r = this.result;
+      const text = `【退休金試算結果】\n`+
+        `勞保老年年金：約 ${this.fmt(r.labor)} 元/月\n`+
+        `勞退新制：約 ${this.fmt(r.pension)} 元/月\n`+
+        `國民年金：約 ${this.fmt(r.nat)} 元/月\n`+
+        `三項合計：約 ${this.fmt(r.total)} 元/月\n`+
+        `理想退休生活費：約 ${this.fmt(r.goal)} 元/月\n`+
+        `${r.gap > 0 ? '每月缺口約 ' + this.fmt(r.gap) + ' 元' : '已達成目標，每月結餘約 ' + this.fmt(-r.gap) + ' 元'}\n`+
+        `（本結果僅供參考，實際給付以勞保局公告為準）`;
+      this.copyText(text);
+    },
+    copyText(text){
+      const done = () => this.showToast('已複製，貼給我看看吧！');
+      const fail = () => this.showToast('複製失敗，請手動選取文字複製');
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done).catch(() => this.fallbackCopy(text, done, fail));
+      } else {
+        this.fallbackCopy(text, done, fail);
+      }
+    },
+    fallbackCopy(text, done, fail){
+      try{
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        ok ? done() : fail();
+      } catch(e){
+        fail();
+      }
+    },
+    showToast(msg){
+      this.toastMsg = msg;
+      this.toastShow = true;
+      setTimeout(() => this.toastShow = false, 2200);
+    },
+    save(){
+      try{ localStorage.setItem('retireGapCalc_v1', JSON.stringify(this.f)); }catch(e){}
+    },
+    load(){
+      try{
+        const raw = localStorage.getItem('retireGapCalc_v1');
+        if(raw){ Object.assign(this.f, JSON.parse(raw)); }
+      }catch(e){}
+    },
+    reportHeight(){
+      const h = document.body.scrollHeight;
+      window.parent.postMessage({ type: 'resize-iframe', height: h }, '*');
+    }
+  },
+  mounted(){
+    this.load();
+    const ro = new ResizeObserver(() => this.reportHeight());
+    ro.observe(document.body);
+    window.addEventListener('load', () => this.reportHeight());
+    setTimeout(() => this.reportHeight(), 300);
+  }
+}).mount('#app');
+</script>
+</body>
+</html>

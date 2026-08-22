@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>時間齒輪｜幾歲領勞保退休金最划算？</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Roboto+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+  :root{
+    --bg-deep:#101B26;
+    --bg-panel:#1B2A38;
+    --bg-panel-2:#22364572;
+    --brass:#C9A15C;
+    --brass-light:#E8CF9C;
+    --brass-dark:#8B6B3B;
+    --cream:#F1E7D3;
+    --ink:#EDE6D6;
+    --muted:#8FA0AF;
+    --red:#B2503F;
+    --red-light:#D98A78;
+    --green:#5C9078;
+    --green-light:#94C7AB;
+    --line:#3A4E5E;
+    --shadow: 0 12px 30px rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(ellipse at top, #16232F 0%, var(--bg-deep) 55%, #0B141C 100%);
+    color:var(--ink);
+    font-family:'Noto Sans TC', sans-serif;
+    min-height:100vh;
+    padding:20px 14px 32px;
+    overflow-x:hidden;
+  }
+
+  .app{max-width:920px;margin:0 auto;}
+
+  header{
+    text-align:center;
+    margin-bottom:22px;
+  }
+  header .eyebrow{
+    font-family:'Roboto Mono', monospace;
+    letter-spacing:0.28em;
+    font-size:12px;
+    color:var(--brass-light);
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  header h1{
+    font-family:'Noto Serif TC', serif;
+    font-weight:900;
+    font-size:clamp(22px, 5vw, 32px);
+    margin:0 0 8px;
+    color:var(--cream);
+    letter-spacing:0.02em;
+  }
+  header p{
+    margin:0;
+    color:var(--muted);
+    font-size:17px;
+    line-height:1.7;
+  }
+
+  .input-panel{
+    background: linear-gradient(160deg, var(--bg-panel) 0%, #16222D 100%);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:18px 22px 16px;
+    box-shadow:var(--shadow);
+    margin-bottom:20px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .input-row{display:flex;flex-direction:column;gap:6px;}
+  .input-label{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-size:15px;
+    color:var(--muted);
+  }
+  .input-label .input-value{
+    font-family:'Roboto Mono', monospace;
+    font-size:18px;
+    color:var(--brass-light);
+    font-weight:500;
+  }
+  input[type="range"].grade-slider{
+    -webkit-appearance:none;
+    appearance:none;
+    width:100%;
+    height:6px;
+    border-radius:999px;
+    background:linear-gradient(90deg, var(--brass-dark), var(--brass));
+    outline:none;
+    cursor:pointer;
+  }
+  input[type="range"].grade-slider::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    width:20px;height:20px;
+    border-radius:50%;
+    background:var(--brass-light);
+    border:3px solid #16222D;
+    box-shadow:0 2px 6px rgba(0,0,0,0.4);
+    cursor:pointer;
+  }
+  input[type="range"].grade-slider::-moz-range-thumb{
+    width:20px;height:20px;
+    border-radius:50%;
+    background:var(--brass-light);
+    border:3px solid #16222D;
+    box-shadow:0 2px 6px rgba(0,0,0,0.4);
+    cursor:pointer;
+  }
+  .eligibility-note{
+    display:none;
+    font-size:14.5px;
+    line-height:1.7;
+    color:var(--red-light);
+    background:rgba(178,80,63,0.12);
+    border:1px solid rgba(178,80,63,0.35);
+    border-radius:10px;
+    padding:10px 12px;
+  }
+  .eligibility-note.show{display:block;}
+  .eligibility-note b{color:var(--red-light);}
+
+  .main-grid{
+    display:grid;
+    grid-template-columns: minmax(280px, 380px) 1fr;
+    gap:20px;
+    align-items:stretch;
+    margin-bottom:20px;
+  }
+  @media (max-width: 720px){
+    .main-grid{grid-template-columns:1fr;}
+  }
+
+  .dial-card{
+    background: linear-gradient(160deg, var(--bg-panel) 0%, #16222D 100%);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:20px 16px 14px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    box-shadow:var(--shadow);
+    position:relative;
+  }
+  .dial-hint{
+    font-size:14px;
+    color:var(--muted);
+    text-align:center;
+    margin-top:10px;
+    line-height:1.6;
+  }
+  .dial-hint b{color:var(--brass-light);font-weight:500;}
+
+  #dialCanvas{
+    touch-action:none;
+    cursor:grab;
+    outline:none;
+  }
+  #dialCanvas:active{cursor:grabbing;}
+  #dialCanvas:focus-visible{
+    box-shadow:0 0 0 3px var(--brass-light);
+    border-radius:50%;
+  }
+
+  .stats-panel{
+    background: linear-gradient(160deg, var(--bg-panel) 0%, #16222D 100%);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:22px 22px 20px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .age-headline{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:14px;
+  }
+  .age-headline .num{
+    font-family:'Roboto Mono', monospace;
+    font-weight:700;
+    font-size:58px;
+    color:var(--brass-light);
+    line-height:1;
+  }
+  .age-headline .lbl{
+    font-size:17px;
+    color:var(--muted);
+  }
+  .age-headline .tag{
+    margin-left:auto;
+    font-size:14px;
+    padding:5px 10px;
+    border-radius:999px;
+    font-weight:500;
+    white-space:nowrap;
+  }
+  .tag.early{background:rgba(178,80,63,0.18);color:var(--red-light);border:1px solid rgba(178,80,63,0.4);}
+  .tag.base{background:rgba(201,161,92,0.18);color:var(--brass-light);border:1px solid rgba(201,161,92,0.4);}
+  .tag.late{background:rgba(92,144,120,0.18);color:var(--green-light);border:1px solid rgba(92,144,120,0.4);}
+
+  .stat-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:16px;
+    color:var(--muted);
+  }
+  .stat-row .v{
+    font-family:'Roboto Mono', monospace;
+    font-size:23px;
+    color:var(--ink);
+    font-weight:500;
+  }
+  .stat-row .v.pos{color:var(--green-light);}
+  .stat-row .v.neg{color:var(--red-light);}
+
+  .stats-panel.ineligible .stat-row .v{color:var(--muted);}
+  .stats-panel.ineligible .age-headline .num{color:var(--muted);}
+
+  .divider{height:1px;background:var(--line);margin:2px 0;}
+
+  .breakeven-card{
+    background:var(--bg-panel-2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:15.5px;
+    line-height:1.75;
+    color:var(--ink);
+  }
+  .breakeven-card .title{
+    font-size:12.5px;
+    letter-spacing:0.14em;
+    color:var(--brass-light);
+    font-weight:500;
+    margin-bottom:6px;
+    font-family:'Roboto Mono', monospace;
+  }
+  .breakeven-card b{color:var(--brass-light);}
+
+  .chart-card{
+    background: linear-gradient(160deg, var(--bg-panel) 0%, #16222D 100%);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:20px 20px 14px;
+    box-shadow:var(--shadow);
+    margin-bottom:18px;
+  }
+  .chart-card h2{
+    font-family:'Noto Serif TC', serif;
+    font-size:20px;
+    font-weight:700;
+    margin:0 0 2px;
+    color:var(--cream);
+  }
+  .chart-card .sub{
+    font-size:14px;
+    color:var(--muted);
+    margin-bottom:10px;
+  }
+  #barCanvas{width:100%;display:block;}
+
+  .assumptions{
+    text-align:center;
+    font-size:14px;
+    color:var(--muted);
+    margin-bottom:18px;
+    line-height:1.8;
+  }
+  .assumptions span{color:var(--brass-light);}
+
+  footer{
+    text-align:center;
+  }
+  .cta-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:linear-gradient(135deg, var(--brass) 0%, var(--brass-dark) 100%);
+    color:#1A140A;
+    font-weight:700;
+    font-size:18px;
+    padding:13px 26px;
+    border-radius:999px;
+    text-decoration:none;
+    box-shadow:0 8px 20px rgba(201,161,92,0.25);
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+    border:none;
+    cursor:pointer;
+  }
+  .cta-btn:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(201,161,92,0.35);}
+  .disclaimer{
+    margin-top:14px;
+    font-size:12.5px;
+    color:var(--muted);
+    line-height:1.7;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="eyebrow">RETIREMENT · TIME GEAR</div>
+    <h1>時間齒輪：幾歲領勞保最划算？</h1>
+    <p>轉動錶盤，選擇你的請領年齡 —— 看角色如何老去，也看金額如何變化</p>
+  </header>
+
+  <div class="input-panel">
+    <div class="input-row">
+      <div class="input-label">
+        <span>月投保薪資（對應勞保 115 年 11 級投保薪資分級表）</span>
+        <span class="input-value" id="salaryVal">45,800 元（第 11 級）</span>
+      </div>
+      <input type="range" class="grade-slider" id="salarySlider" min="0" max="10" step="1" value="10">
+    </div>
+    <div class="input-row">
+      <div class="input-label">
+        <span>投保年資</span>
+        <span class="input-value" id="yearsVal">30 年</span>
+      </div>
+      <input type="range" class="grade-slider" id="yearsSlider" min="0" max="40" step="1" value="30">
+    </div>
+    <div class="eligibility-note" id="eligibilityNote">
+      ⚠ 年資未達 <b>15 年</b>，不符合「老年年金」（月退）請領資格，僅能申請「一次請領老年給付」，沒有月退金額可以比較。
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div class="dial-card">
+      <canvas id="dialCanvas" tabindex="0" role="slider" aria-label="請領年齡" aria-valuemin="60" aria-valuemax="70" aria-valuenow="65"></canvas>
+      <div class="dial-hint">拖曳錶盤指針，或用滑鼠滾輪／方向鍵調整 &nbsp;·&nbsp; 範圍 <b>60～70 歲</b></div>
+    </div>
+
+    <div class="stats-panel">
+      <div class="age-headline">
+        <span class="num" id="ageNum">65</span>
+        <span class="lbl">歲請領</span>
+        <span class="tag base" id="ageTag">法定基準</span>
+      </div>
+
+      <div class="stat-row"><span>給付率（相對 65 歲基準）</span><span class="v" id="rateVal">100%</span></div>
+      <div class="stat-row"><span>估算月領金額</span><span class="v" id="monthlyVal">NT$ 0</span></div>
+      <div class="divider"></div>
+      <div class="stat-row"><span>與 65 歲基準相比／月</span><span class="v" id="diffVal">持平</span></div>
+
+      <div class="breakeven-card" id="breakevenCard">
+        <div class="title">損益平衡點分析</div>
+        <div id="breakevenText">目前選擇的是 65 歲基準年齡，沒有提前或延後的差異。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <h2>累計總領金額比較</h2>
+    <div class="sub" id="chartSub">假設活到 85 歲，比較「目前選擇」與「65 歲基準」的累計總額</div>
+    <canvas id="barCanvas"></canvas>
+  </div>
+
+  <div class="assumptions">
+    給付規則：提前每年 <span>−4%</span>（最多 −20%）／延後每年 <span>+4%</span>（最多 +20%）　·　月退資格：投保年資需滿 <span>15 年</span>　·　月投保薪資對應 115 年勞保 <span>11 級</span>分級表（29,500～45,800 元）
+  </div>
+
+  <footer>
+    <a class="cta-btn" href="https://line.me/" target="_blank" rel="noopener">
+      💬 加 LINE 免費算出我的退休金
+    </a>
+    <div class="disclaimer">
+      本工具僅為觀念示意，實際請領金額請以勞動部勞工保險局官方試算結果為準。<br>
+      製作：阿福教練 Coach Afu
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  // ---------- 共用參數 ----------
+  const MIN_AGE = 60, MAX_AGE = 70, BASE_AGE = 65;
+  const MIN_YEARS_FOR_PENSION = 15;
+  const LIFE_EXPECTANCY = 85;
+  // 115 年（2026年）勞保投保薪資分級表，全職勞工共 11 級
+  const SALARY_GRADES = [29500,30300,31800,33300,34800,36300,38200,40100,42000,43900,45800];
+
+  let currentSalary = 45800;
+  let currentYears = 30;
+  let currentAge = BASE_AGE;
+  let displayAge = BASE_AGE; // 用於平滑動畫
+  let animId = null;
+
+  function isEligible(){
+    return currentYears >= MIN_YEARS_FOR_PENSION;
+  }
+  // 簡化版勞保老年年金基本試算公式（僅供概念示意，非官方公式）
+  function baseMonthly(){
+    return currentSalary * currentYears * 0.01555;
+  }
+  function rateForAge(age){
+    const diff = age - BASE_AGE;
+    let rate = 1 + diff * 0.04;
+    rate = Math.max(0.8, Math.min(1.2, rate));
+    return rate;
+  }
+  function monthlyForAge(age){
+    return baseMonthly() * rateForAge(age);
+  }
+  function fmtMoney(n){
+    return 'NT$ ' + Math.round(n).toLocaleString('en-US');
+  }
+
+  // ---------- 錶盤 Canvas ----------
+  const dialCanvas = document.getElementById('dialCanvas');
+  const dctx = dialCanvas.getContext('2d');
+  let DPR = window.devicePixelRatio || 1;
+  let dialSize = 300;
+
+  function sizeDial(){
+    const wrapWidth = dialCanvas.parentElement.clientWidth;
+    dialSize = Math.max(240, Math.min(340, wrapWidth - 32));
+    dialCanvas.style.width = dialSize + 'px';
+    dialCanvas.style.height = dialSize + 'px';
+    dialCanvas.width = dialSize * DPR;
+    dialCanvas.height = dialSize * DPR;
+    dctx.setTransform(DPR,0,0,DPR,0,0);
+    drawDial();
+  }
+
+  // 弧線角度設定：從 -150deg 到 +150deg（順時針），對應 60 -> 70 歲
+  const ARC_START = -150; // deg
+  const ARC_END = 150;    // deg
+  function ageToAngle(age){
+    const t = (age - MIN_AGE) / (MAX_AGE - MIN_AGE);
+    return ARC_START + t * (ARC_END - ARC_START);
+  }
+  function angleToAge(angleDeg){
+    let t = (angleDeg - ARC_START) / (ARC_END - ARC_START);
+    t = Math.max(0, Math.min(1, t));
+    return MIN_AGE + t * (MAX_AGE - MIN_AGE);
+  }
+  function deg2rad(d){ return d * Math.PI / 180; }
+
+  function drawDial(){
+    const w = dialSize, h = dialSize;
+    const cx = w/2, cy = h/2;
+    const R = w/2 - 14;
+    dctx.clearRect(0,0,w,h);
+
+    // 外圈黃銅錶圈
+    const ringGrad = dctx.createLinearGradient(0,0,w,h);
+    ringGrad.addColorStop(0, '#E8CF9C');
+    ringGrad.addColorStop(0.5, '#C9A15C');
+    ringGrad.addColorStop(1, '#8B6B3B');
+    dctx.beginPath();
+    dctx.arc(cx, cy, R, 0, Math.PI*2);
+    dctx.fillStyle = ringGrad;
+    dctx.fill();
+
+    // 內錶面
+    const faceR = R - 14;
+    const faceGrad = dctx.createRadialGradient(cx, cy-faceR*0.3, faceR*0.1, cx, cy, faceR);
+    faceGrad.addColorStop(0, '#25333F');
+    faceGrad.addColorStop(1, '#182430');
+    dctx.beginPath();
+    dctx.arc(cx, cy, faceR, 0, Math.PI*2);
+    dctx.fillStyle = faceGrad;
+    dctx.fill();
+    dctx.lineWidth = 2;
+    dctx.strokeStyle = 'rgba(201,161,92,0.5)';
+    dctx.stroke();
+
+    // 刻度與數字 60~70
+    for(let age = MIN_AGE; age <= MAX_AGE; age++){
+      const ang = deg2rad(ageToAngle(age) - 90);
+      const isBase = age === BASE_AGE;
+      const tickOuter = faceR - 6;
+      const tickInner = isBase ? faceR - 22 : faceR - 16;
+      const x1 = cx + tickOuter*Math.cos(ang), y1 = cy + tickOuter*Math.sin(ang);
+      const x2 = cx + tickInner*Math.cos(ang), y2 = cy + tickInner*Math.sin(ang);
+      dctx.beginPath();
+      dctx.moveTo(x1,y1);
+      dctx.lineTo(x2,y2);
+      dctx.lineWidth = isBase ? 3 : 1.6;
+      dctx.strokeStyle = isBase ? '#E8CF9C' : 'rgba(237,230,214,0.55)';
+      dctx.stroke();
+
+      const labelR = faceR - 32;
+      const lx = cx + labelR*Math.cos(ang), ly = cy + labelR*Math.sin(ang);
+      dctx.font = (isBase ? '700 ' : '500 ') + '13px "Roboto Mono", monospace';
+      dctx.fillStyle = isBase ? '#E8CF9C' : 'rgba(237,230,214,0.7)';
+      dctx.textAlign = 'center';
+      dctx.textBaseline = 'middle';
+      dctx.fillText(age, lx, ly);
+    }
+
+    // 指針
+    const needleAngle = deg2rad(ageToAngle(displayAge) - 90);
+    const needleLen = faceR - 26;
+    dctx.save();
+    dctx.translate(cx, cy);
+    dctx.rotate(needleAngle + Math.PI/2);
+    const grad = dctx.createLinearGradient(0,0,0,-needleLen);
+    grad.addColorStop(0, '#B2503F');
+    grad.addColorStop(1, '#D98A78');
+    dctx.beginPath();
+    dctx.moveTo(-4, 10);
+    dctx.lineTo(4, 10);
+    dctx.lineTo(0, -needleLen);
+    dctx.closePath();
+    dctx.fillStyle = grad;
+    dctx.fill();
+    dctx.restore();
+
+    // 中央角色小頭像
+    drawCharacter(dctx, cx, cy, faceR*0.55, displayAge);
+
+    // 中心軸點
+    dctx.beginPath();
+    dctx.arc(cx, cy, 5, 0, Math.PI*2);
+    dctx.fillStyle = '#E8CF9C';
+    dctx.fill();
+  }
+
+  // ---------- 角色老化插畫 ----------
+  function drawCharacter(ctx, cx, cy, r, age){
+    const t = (age - MIN_AGE) / (MAX_AGE - MIN_AGE); // 0~1
+    ctx.save();
+    ctx.translate(cx, cy + r*0.15);
+
+    // 身體隨年齡微駝
+    const stoop = t * 4;
+
+    // 底座光暈
+    ctx.beginPath();
+    ctx.arc(0, r*0.15, r*1.05, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(241,231,211,0.05)';
+    ctx.fill();
+
+    // 肩膀／身體
+    ctx.beginPath();
+    ctx.ellipse(0 + stoop*0.3, r*0.55 + stoop*0.3, r*0.62, r*0.42, 0, 0, Math.PI*2);
+    ctx.fillStyle = '#3A4E5E';
+    ctx.fill();
+
+    // 頭
+    const headR = r*0.42;
+    ctx.beginPath();
+    ctx.arc(0, -r*0.05, headR, 0, Math.PI*2);
+    ctx.fillStyle = '#E8C9A6';
+    ctx.fill();
+
+    // 頭髮：隨年齡變白、變少
+    const hairGrey = t; // 0 深色 -> 1 全白
+    const hairColor = mixColor([60,48,38], [225,222,214], hairGrey);
+    ctx.beginPath();
+    ctx.arc(0, -r*0.05 - headR*0.15, headR*1.02, Math.PI*1.02, Math.PI*1.98);
+    ctx.lineWidth = headR*0.42*(1 - hairGrey*0.35);
+    ctx.strokeStyle = `rgb(${hairColor[0]},${hairColor[1]},${hairColor[2]})`;
+    ctx.stroke();
+
+    // 眼鏡（65歲以上更常見，但這裡固定戴，象徵閱讀退休規劃文件）
+    ctx.strokeStyle = '#22303B';
+    ctx.lineWidth = Math.max(1.2, headR*0.06);
+    const eyeY = -r*0.05;
+    const eyeDX = headR*0.42;
+    const eyeR = headR*0.26;
+    ctx.beginPath();
+    ctx.arc(-eyeDX, eyeY, eyeR, 0, Math.PI*2);
+    ctx.moveTo(eyeDX + eyeR, eyeY);
+    ctx.arc(eyeDX, eyeY, eyeR, 0, Math.PI*2);
+    ctx.moveTo(-eyeDX + eyeR, eyeY);
+    ctx.lineTo(eyeDX - eyeR, eyeY);
+    ctx.stroke();
+
+    // 皺紋：隨年齡增加條數
+    const wrinkleCount = Math.round(t*3);
+    ctx.strokeStyle = 'rgba(120,90,65,0.55)';
+    ctx.lineWidth = 1;
+    for(let i=0;i<wrinkleCount;i++){
+      const wy = eyeY + headR*0.55 + i*3.2;
+      ctx.beginPath();
+      ctx.moveTo(-headR*0.3, wy);
+      ctx.quadraticCurveTo(0, wy+2, headR*0.3, wy);
+      ctx.stroke();
+    }
+    // 額頭皺紋
+    for(let i=0;i<Math.round(t*2);i++){
+      const wy = -r*0.05 - headR*0.55 + i*3;
+      ctx.beginPath();
+      ctx.moveTo(-headR*0.35, wy);
+      ctx.lineTo(headR*0.35, wy);
+      ctx.stroke();
+    }
+
+    // 微笑嘴
+    ctx.beginPath();
+    ctx.strokeStyle = '#7A4B3A';
+    ctx.lineWidth = 1.4;
+    ctx.arc(0, eyeY + headR*0.55, headR*0.32, 0.15*Math.PI, 0.85*Math.PI);
+    ctx.stroke();
+
+    // 拐杖：67 歲以上出現
+    if(age >= 67){
+      ctx.strokeStyle = '#8B6B3B';
+      ctx.lineWidth = Math.max(2, r*0.06);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(r*0.55, r*0.2);
+      ctx.lineTo(r*0.7, r*1.05);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(r*0.55, r*0.2, r*0.1, Math.PI*0.2, Math.PI*1.4);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  function mixColor(a, b, t){
+    return [
+      Math.round(a[0] + (b[0]-a[0])*t),
+      Math.round(a[1] + (b[1]-a[1])*t),
+      Math.round(a[2] + (b[2]-a[2])*t)
+    ];
+  }
+
+  // ---------- 拖曳互動 ----------
+  let dragging = false;
+
+  function pointerAngle(clientX, clientY){
+    const rect = dialCanvas.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    let ang = Math.atan2(clientY - cy, clientX - cx) * 180/Math.PI + 90; // 對齊 12 點方向為 0
+    // 正規化到 -180~180
+    if(ang > 180) ang -= 360;
+    if(ang < -180) ang += 360;
+    return ang;
+  }
+
+  function setAgeFromAngle(ang){
+    const age = Math.round(angleToAge(ang));
+    setAge(age);
+  }
+
+  dialCanvas.addEventListener('pointerdown', (e)=>{
+    dragging = true;
+    dialCanvas.setPointerCapture(e.pointerId);
+    setAgeFromAngle(pointerAngle(e.clientX, e.clientY));
+  });
+  dialCanvas.addEventListener('pointermove', (e)=>{
+    if(!dragging) return;
+    setAgeFromAngle(pointerAngle(e.clientX, e.clientY));
+  });
+  dialCanvas.addEventListener('pointerup', (e)=>{
+    dragging = false;
+  });
+  dialCanvas.addEventListener('pointercancel', ()=>{ dragging=false; });
+
+  dialCanvas.addEventListener('wheel', (e)=>{
+    e.preventDefault();
+    const dir = e.deltaY > 0 ? 1 : -1;
+    setAge(currentAge + dir);
+  }, {passive:false});
+
+  dialCanvas.addEventListener('keydown', (e)=>{
+    if(e.key === 'ArrowUp' || e.key === 'ArrowRight'){ e.preventDefault(); setAge(currentAge+1); }
+    if(e.key === 'ArrowDown' || e.key === 'ArrowLeft'){ e.preventDefault(); setAge(currentAge-1); }
+  });
+
+  // ---------- 動畫過渡（指針與數字平滑移動） ----------
+  function animateTo(target){
+    cancelAnimationFrame(animId);
+    const startVal = displayAge;
+    const startTime = performance.now();
+    const dur = 260;
+    function step(now){
+      const p = Math.min(1, (now - startTime)/dur);
+      const eased = 1 - Math.pow(1-p, 3);
+      displayAge = startVal + (target - startVal)*eased;
+      drawDial();
+      drawBarChart(displayAge);
+      if(p < 1){
+        animId = requestAnimationFrame(step);
+      } else {
+        displayAge = target;
+        drawDial();
+        drawBarChart(displayAge);
+      }
+    }
+    animId = requestAnimationFrame(step);
+  }
+
+  // ---------- 主要狀態更新 ----------
+  function setAge(age){
+    age = Math.max(MIN_AGE, Math.min(MAX_AGE, Math.round(age)));
+    if(age === currentAge) { animateTo(age); return; }
+    currentAge = age;
+    updateStats();
+    animateTo(age);
+    dialCanvas.setAttribute('aria-valuenow', age);
+  }
+
+  function updateStats(){
+    document.getElementById('ageNum').textContent = currentAge;
+    const statsPanel = document.querySelector('.stats-panel');
+    const eligibilityNote = document.getElementById('eligibilityNote');
+
+    if(!isEligible()){
+      statsPanel.classList.add('ineligible');
+      eligibilityNote.classList.add('show');
+
+      document.getElementById('rateVal').textContent = '—';
+      document.getElementById('monthlyVal').textContent = '不適用（僅能一次請領）';
+      const diffEl = document.getElementById('diffVal');
+      diffEl.textContent = '—';
+      diffEl.className = 'v';
+
+      const tagEl = document.getElementById('ageTag');
+      tagEl.textContent = '未達月退資格'; tagEl.className = 'tag early';
+
+      document.getElementById('breakevenText').innerHTML =
+        `目前投保年資為 <b>${currentYears} 年</b>，未達請領「老年年金」（月退）所需的 <b>15 年</b>門檻。` +
+        `依規定，年資未滿 15 年者僅能申請「一次請領老年給付」，沒有月退金額可以比較展延或減給。` +
+        `<br><br>把上方「投保年資」滑桿調到 <b>15 年以上</b>，就能看到完整的月退試算與損益平衡點分析。`;
+      return;
+    }
+
+    statsPanel.classList.remove('ineligible');
+    eligibilityNote.classList.remove('show');
+
+    const rate = rateForAge(currentAge);
+    const monthly = monthlyForAge(currentAge);
+    const baseAmt = baseMonthly();
+    const diffMonthly = monthly - baseAmt;
+
+    document.getElementById('rateVal').textContent = (rate*100).toFixed(0) + '%';
+    document.getElementById('monthlyVal').textContent = fmtMoney(monthly);
+
+    const diffEl = document.getElementById('diffVal');
+    if(currentAge === BASE_AGE){
+      diffEl.textContent = '持平（基準年齡）';
+      diffEl.className = 'v';
+    } else if(diffMonthly > 0){
+      diffEl.textContent = '+' + fmtMoney(diffMonthly) + ' / 月';
+      diffEl.className = 'v pos';
+    } else {
+      diffEl.textContent = '−' + fmtMoney(Math.abs(diffMonthly)) + ' / 月';
+      diffEl.className = 'v neg';
+    }
+
+    const tagEl = document.getElementById('ageTag');
+    if(currentAge === BASE_AGE){
+      tagEl.textContent = '法定基準'; tagEl.className = 'tag base';
+    } else if(currentAge < BASE_AGE){
+      tagEl.textContent = '提前請領（減給）'; tagEl.className = 'tag early';
+    } else {
+      tagEl.textContent = '延後請領（展延加給）'; tagEl.className = 'tag late';
+    }
+
+    updateBreakeven();
+  }
+
+  // ---------- 損益平衡點分析 ----------
+  function updateBreakeven(){
+    if(!isEligible()) return; // 不符資格時的文字已在 updateStats 內設定
+    const textEl = document.getElementById('breakevenText');
+    if(currentAge === BASE_AGE){
+      textEl.innerHTML = '目前選擇的是 <b>65 歲基準年齡</b>，沒有提前或延後的差異。試著轉動錶盤，看看提前或延後請領會如何影響總金額。';
+      return;
+    }
+    const ageA = currentAge, ageB = BASE_AGE;
+    const mA = monthlyForAge(ageA), mB = monthlyForAge(ageB);
+    // L*(mA-mB) = mA*ageA - mB*ageB  =>  L = (mA*ageA - mB*ageB)/(mA-mB)
+    const L = (mA*ageA - mB*ageB) / (mA - mB);
+
+    if(currentAge < BASE_AGE){
+      if(L > BASE_AGE && L < 100){
+        textEl.innerHTML = `提前到 <b>${ageA} 歲</b>請領，因為較早開始累積，短期領得比較多；但如果活到 <b>${L.toFixed(1)} 歲</b>之後，累計總額會被「65 歲請領」反超 —— 之後每多活一年，65 歲基準都會領得更多。`;
+      } else {
+        textEl.innerHTML = `提前到 <b>${ageA} 歲</b>請領，在一般的壽命範圍內，累計總額都會持續領先 65 歲基準（平衡點落在 ${L.toFixed(0)} 歲，超出常見壽命假設）。`;
+      }
+    } else {
+      if(L > BASE_AGE && L < 100){
+        textEl.innerHTML = `延後到 <b>${ageA} 歲</b>請領，前期因為還沒開始領，累計金額會落後；但如果活到 <b>${L.toFixed(1)} 歲</b>之後，累計總額就會反超 65 歲基準 —— 之後每多活一年，延後請領都更划算。`;
+      } else {
+        textEl.innerHTML = `延後到 <b>${ageA} 歲</b>請領，在一般的壽命範圍內，累計總額都難以追上 65 歲基準（平衡點落在 ${L.toFixed(0)} 歲）。`;
+      }
+    }
+  }
+
+  // ---------- 長條圖 ----------
+  const barCanvas = document.getElementById('barCanvas');
+  const bctx = barCanvas.getContext('2d');
+
+  function sizeBar(){
+    const wrapWidth = barCanvas.parentElement.clientWidth - 40;
+    const w = Math.max(280, wrapWidth);
+    const h = 240;
+    barCanvas.style.width = w + 'px';
+    barCanvas.style.height = h + 'px';
+    barCanvas.width = w * DPR;
+    barCanvas.height = h * DPR;
+    bctx.setTransform(DPR,0,0,DPR,0,0);
+    drawBarChart(displayAge);
+  }
+
+  function cumulativeTotal(age){
+    const months = Math.max(0, (LIFE_EXPECTANCY - age)) * 12;
+    return monthlyForAge(age) * months;
+  }
+
+  function drawBarChart(ageForNeedle){
+    const w = parseFloat(barCanvas.style.width);
+    const h = parseFloat(barCanvas.style.height);
+    bctx.clearRect(0,0,w,h);
+
+    if(!isEligible()){
+      bctx.font = '600 17px "Noto Sans TC", sans-serif';
+      bctx.fillStyle = '#8FA0AF';
+      bctx.textAlign = 'center';
+      bctx.fillText('年資未滿 15 年，沒有月退資料可以比較', w/2, h/2 - 10);
+      bctx.font = '400 14px "Noto Sans TC", sans-serif';
+      bctx.fillText('調整上方年資滑桿到 15 年以上即可看到圖表', w/2, h/2 + 16);
+      return;
+    }
+
+    const selAge = Math.round(currentAge);
+    const totalSelected = cumulativeTotal(currentAge); // 用精確 currentAge 算最終數字
+    const totalBase = cumulativeTotal(BASE_AGE);
+    const maxTotal = Math.max(totalSelected, totalBase, 1);
+
+    const padTop = 40, padBottom = 42, padSide = 30;
+    const chartH = h - padTop - padBottom;
+    const barW = Math.min(90, (w - padSide*2)/3.2);
+    const gap = (w - padSide*2 - barW*2) / 3;
+
+    const bars = [
+      { label: currentAge + ' 歲', value: totalSelected, color: currentAge < BASE_AGE ? '#B2503F' : (currentAge > BASE_AGE ? '#5C9078' : '#C9A15C') },
+      { label: '65 歲基準', value: totalBase, color: '#C9A15C' }
+    ];
+
+    bars.forEach((b, i)=>{
+      const x = padSide + gap + i*(barW+gap);
+      const barH = (b.value / maxTotal) * chartH;
+      const y = padTop + (chartH - barH);
+
+      const grad = bctx.createLinearGradient(0, y, 0, y+barH);
+      grad.addColorStop(0, b.color);
+      grad.addColorStop(1, shadeColor(b.color, -25));
+      bctx.fillStyle = grad;
+      roundRect(bctx, x, y, barW, barH, 8);
+      bctx.fill();
+
+      bctx.font = '700 22px "Roboto Mono", monospace';
+      bctx.fillStyle = '#F1E7D3';
+      bctx.textAlign = 'center';
+      bctx.fillText(fmtMoneyShort(b.value), x + barW/2, y - 14);
+
+      bctx.font = '700 16px "Noto Sans TC", sans-serif';
+      bctx.fillStyle = b.color;
+      bctx.fillText(b.label, x + barW/2, h - padBottom + 22);
+    });
+
+    // 基準線
+    bctx.strokeStyle = 'rgba(143,160,175,0.25)';
+    bctx.setLineDash([4,4]);
+    bctx.beginPath();
+    bctx.moveTo(padSide-6, padTop);
+    bctx.lineTo(w-padSide+6, padTop);
+    bctx.stroke();
+    bctx.setLineDash([]);
+  }
+
+  function fmtMoneyShort(n){
+    if(n >= 10000){
+      return (n/10000).toFixed(0) + ' 萬';
+    }
+    return Math.round(n).toLocaleString('en-US');
+  }
+
+  function roundRect(ctx, x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w, y, x+w, y+h, r);
+    ctx.arcTo(x+w, y+h, x, y+h, r);
+    ctx.arcTo(x, y+h, x, y, r);
+    ctx.arcTo(x, y, x+w, y, r);
+    ctx.closePath();
+  }
+
+  function shadeColor(hex, percent){
+    const num = parseInt(hex.replace('#',''),16);
+    let r = (num>>16) + Math.round(255*(percent/100));
+    let g = ((num>>8)&0xff) + Math.round(255*(percent/100));
+    let b = (num&0xff) + Math.round(255*(percent/100));
+    r = Math.max(0,Math.min(255,r));
+    g = Math.max(0,Math.min(255,g));
+    b = Math.max(0,Math.min(255,b));
+    return `rgb(${r},${g},${b})`;
+  }
+
+  // ---------- 薪資／年資滑桿 ----------
+  const salarySlider = document.getElementById('salarySlider');
+  const yearsSlider = document.getElementById('yearsSlider');
+  const salaryValEl = document.getElementById('salaryVal');
+  const yearsValEl = document.getElementById('yearsVal');
+
+  function updateSalaryLabel(){
+    const idx = parseInt(salarySlider.value, 10);
+    currentSalary = SALARY_GRADES[idx];
+    salaryValEl.textContent = currentSalary.toLocaleString('en-US') + ' 元（第 ' + (idx+1) + ' 級）';
+  }
+  function updateYearsLabel(){
+    currentYears = parseInt(yearsSlider.value, 10);
+    yearsValEl.textContent = currentYears + ' 年';
+  }
+
+  salarySlider.addEventListener('input', ()=>{
+    updateSalaryLabel();
+    updateStats();
+    drawBarChart(displayAge);
+  });
+  yearsSlider.addEventListener('input', ()=>{
+    updateYearsLabel();
+    updateStats();
+    drawBarChart(displayAge);
+  });
+
+  // ---------- 初始化 ----------
+  function init(){
+    updateSalaryLabel();
+    updateYearsLabel();
+    sizeDial();
+    sizeBar();
+    updateStats();
+    drawBarChart(displayAge);
+  }
+  window.addEventListener('resize', ()=>{ sizeDial(); sizeBar(); });
+  init();
+
+  // ---------- iframe 高度回報（供 Google Sites 嵌入使用） ----------
+  function reportHeight(){
+    const height = document.documentElement.scrollHeight;
+    try{
+      window.parent.postMessage({ type: 'resize-iframe', height: height }, '*');
+    }catch(e){}
+  }
+  window.addEventListener('load', reportHeight);
+  window.addEventListener('resize', reportHeight);
+  setInterval(reportHeight, 1000);
+
+})();
+</script>
+</body>
+</html>

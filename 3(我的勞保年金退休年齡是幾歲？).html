@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的勞保年金退休年齡是幾歲？ - 試算與分析對照表</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+        }
+        .full-pension-cell {
+            background-color: #fecdd3 !important; /* Rose 200 */
+            color: #9f1239 !important; /* Rose 800 */
+            font-weight: 700;
+            border: 2px solid #f43f5e !important;
+        }
+        .early-pension-cell {
+            background-color: #a7f3d0 !important; /* Emerald 200 */
+            color: #065f46 !important; /* Emerald 800 */
+            font-weight: 700;
+            border: 2px solid #10b981 !important;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen">
+    <div id="app" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Header Section -->
+        <header class="bg-gradient-to-r from-slate-900 via-indigo-900 to-blue-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <div class="inline-flex items-center gap-2 bg-indigo-500/30 text-indigo-200 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-3">
+                        <i class="fa-solid fa-calculator"></i> 勞工保險局年金法規對照
+                    </div>
+                    <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight">我的勞保年金退休年齡是幾歲？</h1>
+                    <p class="mt-2 text-indigo-200 text-sm sm:text-base max-w-2xl">
+                        勞保老年年金法定請領年齡由 60 歲逐年調高至 65 歲。快來試算您的法定全額退休年齡、最早可請領「減額年金」與「展延年金」的時間！
+                    </p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-center flex-shrink-0">
+                    <div class="text-xs text-indigo-200">當前調高標準</div>
+                    <div class="text-2xl font-black text-amber-300 mt-1">52年次起 65歲</div>
+                    <div class="text-xs text-indigo-100 mt-1">每提前/延後 1 年增減 4%</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Rules Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-semibold text-slate-500 uppercase">法定全額年金</div>
+                        <div class="text-lg font-bold text-slate-800">紅色標示</div>
+                    </div>
+                </div>
+                <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+                    請領全額年金之法定標準年齡。46年次前為60歲，47~51年次每年加1歲，52年次後固定為65歲。
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-semibold text-slate-500 uppercase">最早減額年金</div>
+                        <div class="text-lg font-bold text-slate-800">綠色標示</div>
+                    </div>
+                </div>
+                <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+                    最多可提前 5 年請領。每提前 1 年減給 4%，最多減給 20%（提前 5 年）。
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-semibold text-slate-500 uppercase">展延年金 (延後請領)</div>
+                        <div class="text-lg font-bold text-slate-800">展延增給</div>
+                    </div>
+                </div>
+                <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+                    符合全額資格後延後請領，最多延後 5 年。每延後 1 年增給 4%，最多增給 20%。
+                </p>
+            </div>
+        </div>
+
+        <!-- Interactive Calculator & Birth Year Selector -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 mb-8">
+            <h2 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-user-gear text-indigo-600"></i> 個人退休年齡快速試算
+            </h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <!-- Input Controls -->
+                <div class="lg:col-span-5 space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">請選擇或輸入您的出生年次（民國）：</label>
+                        <div class="flex gap-3">
+                            <div class="relative flex-1">
+                                <input 
+                                    type="number" 
+                                    v-model.number="selectedRocYear" 
+                                    min="30" 
+                                    max="90" 
+                                    class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg font-bold text-slate-800"
+                                    placeholder="例如：48"
+                                >
+                                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">年次</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">（西元 {{ selectedRocYear + 1911 }} 年生）</p>
+                    </div>
+
+                    <!-- Quick Select Buttons -->
+                    <div>
+                        <span class="text-xs font-semibold text-slate-500 block mb-2">快速選擇對照表主要年次：</span>
+                        <div class="flex flex-wrap gap-2">
+                            <button 
+                                v-for="y in [46, 47, 48, 49, 50, 51, 52]" 
+                                :key="y"
+                                @click="selectedRocYear = y"
+                                :class="selectedRocYear === y ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
+                                class="px-3 py-1.5 rounded-lg text-sm font-semibold transition"
+                            >
+                                {{ y === 46 ? '46前' : y === 52 ? '52後' : y + '年次' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Card -->
+                <div class="lg:col-span-7 bg-slate-50 rounded-2xl p-6 border border-slate-200">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-sm font-bold text-slate-500">試算結果分析</span>
+                        <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">
+                            {{ selectedRocYear }} 年次（{{ selectedRocYear + 1911 }} 年出生）
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Statutory Full Pension -->
+                        <div class="bg-rose-50 border-2 border-rose-300 rounded-xl p-4">
+                            <div class="text-xs font-bold text-rose-600 uppercase flex items-center gap-1">
+                                <i class="fa-solid fa-star"></i> 法定全額年金年齡
+                            </div>
+                            <div class="text-3xl font-black text-rose-700 mt-1">
+                                {{ calculationResult.statutoryAge }} <span class="text-base font-normal">歲</span>
+                            </div>
+                            <div class="text-xs text-rose-800 font-medium mt-2">
+                                於民國 <span class="font-bold underline">{{ calculationResult.statutoryRocYear }} 年</span>（西元 {{ calculationResult.statutoryRocYear + 1911 }} 年）可領 100% 全額
+                            </div>
+                        </div>
+
+                        <!-- Earliest Reduced Pension -->
+                        <div class="bg-emerald-50 border-2 border-emerald-300 rounded-xl p-4">
+                            <div class="text-xs font-bold text-emerald-600 uppercase flex items-center gap-1">
+                                <i class="fa-solid fa-bolt"></i> 最早可領減額年金年齡
+                            </div>
+                            <div class="text-3xl font-black text-emerald-700 mt-1">
+                                {{ calculationResult.statutoryAge - 5 }} <span class="text-base font-normal">歲</span>
+                            </div>
+                            <div class="text-xs text-emerald-800 font-medium mt-2">
+                                於民國 <span class="font-bold underline">{{ calculationResult.statutoryRocYear - 5 }} 年</span>（西元 {{ calculationResult.statutoryRocYear + 1911 - 5 }} 年）提前領（減 20%）
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pension Options Detail Table -->
+                    <div class="mt-4 pt-4 border-t border-slate-200">
+                        <div class="text-xs font-bold text-slate-600 mb-2">提前與延後請領年限對照表：</div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-center border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-200 text-slate-700">
+                                        <th class="py-1 px-2 rounded-l">類型</th>
+                                        <th class="py-1 px-2">提前 5 年</th>
+                                        <th class="py-1 px-2">提前 3 年</th>
+                                        <th class="py-1 px-2 bg-rose-200 text-rose-900 font-bold">法定全額</th>
+                                        <th class="py-1 px-2">延後 3 年</th>
+                                        <th class="py-1 px-2 rounded-r">延後 5 年</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-slate-200">
+                                        <td class="py-1.5 font-semibold text-slate-600">請領年齡</td>
+                                        <td class="text-emerald-700 font-bold">{{ calculationResult.statutoryAge - 5 }}歲</td>
+                                        <td class="text-emerald-600">{{ calculationResult.statutoryAge - 3 }}歲</td>
+                                        <td class="bg-rose-50 text-rose-800 font-bold">{{ calculationResult.statutoryAge }}歲</td>
+                                        <td class="text-indigo-600">{{ calculationResult.statutoryAge + 3 }}歲</td>
+                                        <td class="text-indigo-800 font-bold">{{ calculationResult.statutoryAge + 5 }}歲</td>
+                                    </tr>
+                                    <tr class="border-b border-slate-200">
+                                        <td class="py-1.5 font-semibold text-slate-600">請領年份</td>
+                                        <td>{{ calculationResult.statutoryRocYear - 5 }}年</td>
+                                        <td>{{ calculationResult.statutoryRocYear - 3 }}年</td>
+                                        <td class="bg-rose-50 text-rose-800 font-bold">{{ calculationResult.statutoryRocYear }}年</td>
+                                        <td>{{ calculationResult.statutoryRocYear + 3 }}年</td>
+                                        <td>{{ calculationResult.statutoryRocYear + 5 }}年</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-1.5 font-semibold text-slate-600">給付比例</td>
+                                        <td class="text-emerald-700 font-bold">80% (-20%)</td>
+                                        <td class="text-emerald-600">88% (-12%)</td>
+                                        <td class="bg-rose-50 text-rose-800 font-bold">100%</td>
+                                        <td class="text-indigo-600">112% (+12%)</td>
+                                        <td class="text-indigo-800 font-bold">120% (+20%)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Master Reference Table (Matching Attached Image) -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-table text-indigo-600"></i> 勞保年金退休年齡分析表
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">（重現參考圖表：民國 102 年～ 117 年請領對照）</p>
+                </div>
+                <div class="flex items-center gap-4 text-xs font-semibold">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3.5 h-3.5 rounded bg-emerald-200 border border-emerald-500 inline-block"></span>
+                        <span>最早可領減額年金</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3.5 h-3.5 rounded bg-rose-200 border border-rose-500 inline-block"></span>
+                        <span>法定可領全額年金</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="overflow-x-auto rounded-2xl border border-slate-200 shadow-inner">
+                <table class="w-full text-center text-sm border-collapse">
+                    <thead>
+                        <!-- ROC Year Row -->
+                        <tr class="bg-slate-800 text-white font-bold">
+                            <th class="py-3 px-3 border border-slate-700 min-w-[90px] sticky left-0 bg-slate-800 z-10">民國</th>
+                            <th v-for="year in rocYears" :key="year" class="py-3 px-2 border border-slate-700 min-w-[48px]">
+                                {{ year }}
+                            </th>
+                        </tr>
+                        <!-- Standard Statutory Age Header Row -->
+                        <tr class="bg-slate-200 text-slate-800 font-bold border-b-2 border-slate-400">
+                            <th class="py-2.5 px-3 border border-slate-300 sticky left-0 bg-slate-200 z-10">退休年齡</th>
+                            <th v-for="year in rocYears" :key="year" class="py-2.5 px-2 border border-slate-300 text-indigo-900 font-black">
+                                {{ getStatutoryAgeForYear(year) }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr 
+                            v-for="row in tableData" 
+                            :key="row.birthYear"
+                            :class="{'bg-indigo-50/60': selectedRocYear === row.birthYear}"
+                            class="hover:bg-slate-50 transition"
+                        >
+                            <!-- Birth Year Column -->
+                            <td class="py-2.5 px-3 border border-slate-200 font-bold bg-slate-100 text-slate-800 sticky left-0 z-10">
+                                {{ row.birthYear }}年次
+                            </td>
+
+                            <!-- Ages for each ROC year -->
+                            <td 
+                                v-for="(age, idx) in row.ages" 
+                                :key="idx"
+                                :class="getCellClass(row.birthYear, rocYears[idx], age)"
+                                class="py-2.5 px-2 border border-slate-200 font-medium text-slate-700"
+                            >
+                                {{ age }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Key Footnote & Legal Explanation -->
+            <div class="mt-6 bg-amber-50 rounded-2xl p-5 border border-amber-200 text-amber-900 text-sm space-y-2">
+                <div class="font-bold text-amber-950 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info"></i> 法規重點摘錄說明：
+                </div>
+                <ul class="list-disc list-inside space-y-1 pl-2 text-xs sm:text-sm text-amber-900">
+                    <li>勞保老年年金法定請領年齡原為 <strong>60歲</strong>，107年調高至 <strong>61歲</strong>，其後每 2 年再提高 1 歲，直到 <strong>65歲</strong> 為止。</li>
+                    <li><strong>46年次以前</strong>：法定請領年齡為 60 歲。</li>
+                    <li><strong>47～51年次</strong>：由 60 歲每年加 1 歲，對照為：47年次(61歲)、48年次(62歲)、49年次(63歲)、50年次(64歲)、51年次(65歲)。</li>
+                    <li><strong>52年次以後</strong>：法定請領年齡統一為 <strong>65歲</strong>。</li>
+                    <li><strong>減額年金</strong>：每提前 1 年減給 4%，最多可提前 5 年（減給 20%）。</li>
+                    <li><strong>展延年金</strong>：每延後 1 年增給 4%，最多可延後 5 年（增給 20%）。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-xs text-slate-400 py-6">
+            <p>資料來源：中華民國勞工保險局相關法規條文基準。本工具僅供試算參考，實際請領資格以勞保局正式審定為準。</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                const selectedRocYear = ref(48);
+
+                // Table ROC years: 102 to 117
+                const rocYears = [102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117];
+
+                // Table rows data
+                const tableBirthYears = [47, 48, 49, 50, 51, 52];
+
+                // Standard statutory age for the policy benchmark in each year
+                const getStatutoryAgeForYear = (year) => {
+                    if (year <= 106) return 60;
+                    if (year <= 108) return 61;
+                    if (year <= 110) return 62;
+                    if (year <= 112) return 63;
+                    if (year <= 114) return 64;
+                    return 65;
+                };
+
+                // Statutory age calculation based on birth year
+                const getStatutoryAgeForBirthYear = (bYear) => {
+                    if (bYear <= 46) return 60;
+                    if (bYear === 47) return 61;
+                    if (bYear === 48) return 62;
+                    if (bYear === 49) return 63;
+                    if (bYear === 50) return 64;
+                    return 65; // 51年次及以後
+                };
+
+                // Generate table data
+                const tableData = computed(() => {
+                    return tableBirthYears.map(bYear => {
+                        const ages = rocYears.map(rYear => rYear - bYear);
+                        return {
+                            birthYear: bYear,
+                            ages: ages
+                        };
+                    });
+                });
+
+                // Calculate cell highlight styling
+                const getCellClass = (birthYear, rocYear, age) => {
+                    const statutoryAge = getStatutoryAgeForBirthYear(birthYear);
+                    const earliestAge = statutoryAge - 5;
+
+                    if (age === statutoryAge) {
+                        return 'full-pension-cell'; // Red/Rose for full pension age
+                    }
+                    if (age === earliestAge) {
+                        return 'early-pension-cell'; // Green for earliest reduced pension age
+                    }
+                    return '';
+                };
+
+                // Reactive calculation result for chosen birth year
+                const calculationResult = computed(() => {
+                    const bYear = selectedRocYear.value || 48;
+                    const statutoryAge = getStatutoryAgeForBirthYear(bYear);
+                    const statutoryRocYear = bYear + statutoryAge;
+
+                    return {
+                        birthYear: bYear,
+                        statutoryAge: statutoryAge,
+                        statutoryRocYear: statutoryRocYear
+                    };
+                });
+
+                return {
+                    selectedRocYear,
+                    rocYears,
+                    tableData,
+                    getStatutoryAgeForYear,
+                    getCellClass,
+                    calculationResult
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>您真的了解自身退休權益嗎？懂不懂差很大！- 退休權益互動指南</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font - Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans TC', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        accent: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [v-cloak] { display: none !important; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f766e 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col antialiased selection:bg-teal-500 selection:text-white">
+
+    <div id="app" v-cloak class="flex-grow flex flex-col">
+
+        <!-- HEADER BANNER -->
+        <header class="gradient-bg text-white shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl pointer-events-none">
+                <i class="fa-solid fa-piggy-bank"></i>
+            </div>
+            <div class="max-w-6xl mx-auto px-4 py-8 md:py-12 relative z-10">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="text-center md:text-left">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 text-sm font-semibold mb-3 border border-teal-500/30">
+                            <i class="fa-solid fa-graduation-cap"></i> 講座現場互動輔助講義
+                        </div>
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2 leading-tight">
+                            您真的了解自身退休權益嗎？
+                        </h1>
+                        <p class="text-xl md:text-2xl font-bold text-amber-300 flex items-center justify-center md:justify-start gap-2">
+                            <i class="fa-solid fa-lightbulb text-amber-400"></i> 懂不懂差很大！搞懂退休金不踩坑
+                        </p>
+                    </div>
+                    <!-- Header Action Card -->
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-center w-full md:w-auto min-w-[260px]">
+                        <p class="text-xs text-slate-200 mb-1">今天聽完能幫自己多省/多領數十萬</p>
+                        <div class="text-2xl font-black text-emerald-300 mb-2">9 大關鍵權益大解密</div>
+                        <button @click="activeTab = 'checker'" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold py-2 px-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-calculator"></i> 立即測算我的能領幾筆
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NAVIGATION TABS -->
+            <div class="bg-slate-900/60 border-t border-white/10 backdrop-blur-sm">
+                <div class="max-w-6xl mx-auto px-4">
+                    <div class="flex overflow-x-auto no-scrollbar space-x-1 py-2 text-sm font-medium">
+                        <button @click="activeTab = 'qa'" :class="activeTab === 'qa' ? 'bg-teal-600 text-white shadow-md' : 'text-slate-300 hover:bg-white/10'" class="px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-2">
+                            <i class="fa-solid fa-circle-question"></i> 9大核心問答指南
+                        </button>
+                        <button @click="activeTab = 'quiz'" :class="activeTab === 'quiz' ? 'bg-teal-600 text-white shadow-md' : 'text-slate-300 hover:bg-white/10'" class="px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-2">
+                            <i class="fa-solid fa-gamepad"></i> 互動隨堂隨測IQ
+                        </button>
+                        <button @click="activeTab = 'checker'" :class="activeTab === 'checker' ? 'bg-teal-600 text-white shadow-md' : 'text-slate-300 hover:bg-white/10'" class="px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-2">
+                            <i class="fa-solid fa-sliders"></i> 退休金筆數檢測器
+                        </button>
+                        <button @click="activeTab = 'comparison'" :class="activeTab === 'comparison' ? 'bg-teal-600 text-white shadow-md' : 'text-slate-300 hover:bg-white/10'" class="px-4 py-2.5 rounded-xl transition-all whitespace-nowrap flex items-center gap-2">
+                            <i class="fa-solid fa-table-list"></i> 勞保/勞退/國保懶人包
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
+
+            <section v-if="activeTab === 'qa'" class="space-y-6">
+                <!-- Search & Category Filters -->
+                <div class="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="relative w-full md:w-96">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input v-model="searchQuery" type="text" placeholder="搜尋問題關鍵字（如：兼職、遺屬、舊制...）" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm">
+                    </div>
+                    <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                        <button @click="selectedCategory = 'all'" :class="selectedCategory === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                            全部問題 ({{ questions.length }})
+                        </button>
+                        <button @click="selectedCategory = 'pension_count'" :class="selectedCategory === 'pension_count' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                            退休金筆數
+                        </button>
+                        <button @click="selectedCategory = 'seniority'" :class="selectedCategory === 'seniority' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                            年資計算
+                        </button>
+                        <button @click="selectedCategory = 'parttime'" :class="selectedCategory === 'parttime' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                            兼職雙重投保
+                        </button>
+                        <button @click="selectedCategory = 'national'" :class="selectedCategory === 'national' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                            國民年金
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Questions List Grid -->
+                <div class="grid gap-4">
+                    <div v-for="(item, index) in filteredQuestions" :key="item.id" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:border-teal-300 transition-all">
+                        <!-- Card Header -->
+                        <div @click="toggleQuestion(item.id)" class="p-5 flex items-start justify-between gap-4 cursor-pointer select-none hover:bg-slate-50/80 transition-colors">
+                            <div class="flex items-start gap-3.5">
+                                <span class="flex-shrink-0 w-8 h-8 rounded-xl bg-teal-100 text-teal-700 font-bold flex items-center justify-center text-sm border border-teal-200">
+                                    Q{{ item.id }}
+                                </span>
+                                <div>
+                                    <h3 class="text-base sm:text-lg font-bold text-slate-800 leading-snug">
+                                        {{ item.question }}
+                                    </h3>
+                                    <div class="flex items-center gap-2 mt-1.5">
+                                        <span class="inline-block px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-500">
+                                            {{ item.categoryName }}
+                                        </span>
+                                        <span class="text-xs text-amber-600 font-medium flex items-center gap-1">
+                                            <i class="fa-solid fa-star text-[10px]"></i> 核心觀念
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0 text-slate-400 text-lg pt-1">
+                                <i :class="expandedQuestions.includes(item.id) ? 'fa-solid fa-chevron-up text-teal-600' : 'fa-solid fa-chevron-down'"></i>
+                            </div>
+                        </div>
+
+                        <!-- Card Expanded Content -->
+                        <div v-if="expandedQuestions.includes(item.id)" class="border-t border-slate-100 bg-slate-50/50 p-5 space-y-4">
+                            <!-- Direct Answer Highlight -->
+                            <div class="bg-teal-50 border-l-4 border-teal-500 p-4 rounded-r-xl">
+                                <div class="font-bold text-teal-900 text-sm mb-1 flex items-center gap-2">
+                                    <i class="fa-solid fa-circle-check text-teal-600"></i> 【一話重點答案】
+                                </div>
+                                <p class="text-slate-800 font-semibold text-sm sm:text-base">
+                                    {{ item.shortAnswer }}
+                                </p>
+                            </div>
+
+                            <!-- Detailed Explanation -->
+                            <div class="space-y-2">
+                                <h4 class="font-bold text-slate-700 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="fa-solid fa-book-open text-slate-400"></i> 詳細說明與法規細節：
+                                </h4>
+                                <ul class="list-disc list-inside text-sm text-slate-600 space-y-2 leading-relaxed pl-1">
+                                    <li v-for="(detail, dIdx) in item.details" :key="dIdx" class="pl-1">
+                                        <span class="font-medium text-slate-800">{{ detail.title }}:</span> {{ detail.content }}
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Pro Tip Box -->
+                            <div v-if="item.tip" class="bg-amber-50 rounded-xl p-3.5 border border-amber-200/80 flex items-start gap-3">
+                                <i class="fa-solid fa-user-ninja text-amber-500 text-lg mt-0.5"></i>
+                                <div class="text-xs sm:text-sm text-amber-900">
+                                    <span class="font-bold">專家提醒 / 權益小撇步：</span> {{ item.tip }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section v-if="activeTab === 'quiz'" class="space-y-6">
+                <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 text-center max-w-2xl mx-auto">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold mb-4">
+                        <i class="fa-solid fa-trophy"></i> 退休權益觀念測驗
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-slate-800 mb-2">測測你的退休權益 IQ 到底有多高？</h2>
+                    <p class="text-slate-500 text-sm mb-6">共 5 題精選題目，測完立刻了解你是不是「退休省錢大師」！</p>
+
+                    <!-- Quiz In Progress -->
+                    <div v-if="quizStep < quizQuestions.length">
+                        <div class="flex items-center justify-between text-xs text-slate-400 font-semibold mb-2">
+                            <span>第 {{ quizStep + 1 }} / {{ quizQuestions.length }} 題</span>
+                            <span>完成度 {{ Math.round(((quizStep) / quizQuestions.length) * 100) }}%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-2 rounded-full mb-6 overflow-hidden">
+                            <div class="bg-teal-500 h-full transition-all duration-300" :style="{ width: `${((quizStep) / quizQuestions.length) * 100}%` }"></div>
+                        </div>
+
+                        <!-- Current Question -->
+                        <div class="bg-slate-50 rounded-2xl p-5 mb-6 text-left border border-slate-200">
+                            <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-4">
+                                {{ quizQuestions[quizStep].question }}
+                            </h3>
+                            <div class="space-y-3">
+                                <button v-for="(opt, oIdx) in quizQuestions[quizStep].options" :key="oIdx"
+                                    @click="selectQuizOption(oIdx)"
+                                    :disabled="quizAnswered"
+                                    :class="getOptionClass(oIdx)"
+                                    class="w-full p-3.5 rounded-xl border text-left text-sm font-medium transition flex items-center justify-between">
+                                    <span>{{ opt.text }}</span>
+                                    <i v-if="quizAnswered && oIdx === quizQuestions[quizStep].correct" class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>
+                                    <i v-if="quizAnswered && quizSelectedOpt === oIdx && oIdx !== quizQuestions[quizStep].correct" class="fa-solid fa-circle-xmark text-rose-500 text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Explanation Feedback -->
+                        <div v-if="quizAnswered" class="p-4 rounded-xl mb-6 text-left" :class="quizSelectedOpt === quizQuestions[quizStep].correct ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-rose-50 text-rose-900 border border-rose-200'">
+                            <p class="font-bold text-sm mb-1">
+                                {{ quizSelectedOpt === quizQuestions[quizStep].correct ? '🎉 答對了！非常優秀！' : '❌ 答錯囉！重點觀念提示：' }}
+                            </p>
+                            <p class="text-xs sm:text-sm leading-relaxed">
+                                {{ quizQuestions[quizStep].explanation }}
+                            </p>
+                        </div>
+
+                        <button v-if="quizAnswered" @click="nextQuizStep" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition">
+                            {{ quizStep < quizQuestions.length - 1 ? '下一題 ➔' : '查看最終分數 🎯' }}
+                        </button>
+                    </div>
+
+                    <!-- Quiz Result Summary -->
+                    <div v-else class="space-y-6 py-4">
+                        <div class="text-6xl font-black text-teal-600 mb-2">
+                            {{ quizScore * 20 }} <span class="text-2xl text-slate-400">/ 100分</span>
+                        </div>
+                        <div class="text-lg font-bold text-slate-800">
+                            {{ getQuizTitle() }}
+                        </div>
+                        <p class="text-sm text-slate-600 max-w-md mx-auto">
+                            {{ getQuizFeedback() }}
+                        </p>
+                        <div class="pt-4 flex justify-center gap-3">
+                            <button @click="resetQuiz" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-5 rounded-xl text-sm transition">
+                                <i class="fa-solid fa-rotate-right mr-1"></i> 重新測驗
+                            </button>
+                            <button @click="activeTab = 'checker'" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm transition shadow">
+                                算算看我的退休金 ➔
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section v-if="activeTab === 'checker'" class="space-y-6">
+                <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                    <div class="max-w-3xl mx-auto">
+                        <div class="text-center mb-8">
+                            <span class="px-3 py-1 bg-teal-100 text-teal-800 font-bold text-xs rounded-full">互動神器</span>
+                            <h2 class="text-2xl font-extrabold text-slate-800 mt-2">退休金「你能領幾筆？」互動測算器</h2>
+                            <p class="text-slate-500 text-sm mt-1">勾選您的職涯經歷，馬上知道退休時最多能領幾筆錢！</p>
+                        </div>
+
+                        <!-- Questions Form -->
+                        <div class="space-y-4 mb-8">
+                            <label class="flex items-start p-4 rounded-2xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition select-none">
+                                <input type="checkbox" v-model="userProfile.hasLaborIns" class="mt-1 rounded text-teal-600 focus:ring-teal-500 w-5 h-5">
+                                <div class="ml-3">
+                                    <span class="font-bold text-slate-800 text-sm sm:text-base">1. 曾經或目前有投保「勞工保險（勞保）」</span>
+                                    <p class="text-xs text-slate-500">在公司、工會上班有投保過勞保者。</p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start p-4 rounded-2xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition select-none">
+                                <input type="checkbox" v-model="userProfile.hasLaborPensionNew" class="mt-1 rounded text-teal-600 focus:ring-teal-500 w-5 h-5">
+                                <div class="ml-3">
+                                    <span class="font-bold text-slate-800 text-sm sm:text-base">2. 雇主有為您提繳 6%「勞退新制專戶」</span>
+                                    <p class="text-xs text-slate-500">民國 94 年 7 月 1 日之後任職，雇主每月提繳至勞保局個人專戶。</p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start p-4 rounded-2xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition select-none">
+                                <input type="checkbox" v-model="userProfile.hasLaborPensionOld" class="mt-1 rounded text-teal-600 focus:ring-teal-500 w-5 h-5">
+                                <div class="ml-3">
+                                    <span class="font-bold text-slate-800 text-sm sm:text-base">3. 民國 94 年前就在同一家公司任職，擁有「勞退舊制年資」</span>
+                                    <p class="text-xs text-slate-500">在同一事業單位工作多年，保留舊制退休金年資。</p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start p-4 rounded-2xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition select-none">
+                                <input type="checkbox" v-model="userProfile.hasNationalPension" class="mt-1 rounded text-teal-600 focus:ring-teal-500 w-5 h-5">
+                                <div class="ml-3">
+                                    <span class="font-bold text-slate-800 text-sm sm:text-base">4. 中途待業或轉業時，曾收到過「國民年金（國保）」繳費單並有繳費</span>
+                                    <p class="text-xs text-slate-500">年滿 25 歲未滿 65 歲，未參加勞公農保期間投保國保。</p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start p-4 rounded-2xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition select-none">
+                                <input type="checkbox" v-model="userProfile.isPartTimeMultiple" class="mt-1 rounded text-teal-600 focus:ring-teal-500 w-5 h-5">
+                                <div class="ml-3">
+                                    <span class="font-bold text-slate-800 text-sm sm:text-base">5. 目前或曾有同時在兩家以上公司「兼職/雙重投保勞保」</span>
+                                    <p class="text-xs text-slate-500">同時兼兩份差，兩邊事業單位皆有為您投保勞保與提繳勞退。</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Calculation Results Box -->
+                        <div class="bg-gradient-to-br from-slate-900 to-teal-950 text-white rounded-2xl p-6 shadow-xl border border-teal-500/30">
+                            <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                                <div>
+                                    <span class="text-xs text-teal-300 font-semibold uppercase tracking-wider">估算結果分析</span>
+                                    <h3 class="text-xl font-black text-white">您退休時最多可能領到：</h3>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-4xl font-black text-amber-400">{{ calculatedPensions.totalCount }}</span>
+                                    <span class="text-sm text-slate-300 ml-1">筆退休金</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3 mb-6">
+                                <div v-for="(p, idx) in calculatedPensions.list" :key="idx" class="flex items-start gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
+                                    <i class="fa-solid fa-circle-check text-emerald-400 mt-0.5"></i>
+                                    <div>
+                                        <div class="font-bold text-sm text-amber-200">{{ p.name }}</div>
+                                        <div class="text-xs text-slate-300 leading-relaxed">{{ p.desc }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-teal-500/20 rounded-xl p-4 border border-teal-400/30 text-xs sm:text-sm text-teal-100 leading-relaxed">
+                                <span class="font-bold text-white"><i class="fa-solid fa-lightbulb text-amber-300 mr-1"></i> 專家精算解析：</span>
+                                {{ calculatedPensions.advice }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section v-if="activeTab === 'comparison'" class="space-y-6">
+                <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 overflow-x-auto">
+                    <div class="min-w-[640px]">
+                        <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-table text-teal-600"></i> 一分鐘搞懂：勞保 vs 勞退 vs 國保 差異懶人表
+                        </h2>
+                        <p class="text-xs text-slate-500 mb-6">許多民眾常把「勞保」跟「勞退」混為一談，其實這是兩種完全不同的制度喔！</p>
+
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                                    <th class="p-3.5 rounded-tl-xl">項目</th>
+                                    <th class="p-3.5 bg-teal-50 text-teal-900">勞工保險 (勞保)</th>
+                                    <th class="p-3.5 bg-amber-50 text-amber-900">勞工退休金 (勞退新制)</th>
+                                    <th class="p-3.5 rounded-tr-xl bg-sky-50 text-sky-900">國民年金 (國保)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm divide-y divide-slate-100 text-slate-600">
+                                <tr>
+                                    <td class="p-3.5 font-bold text-slate-800 bg-slate-50/50">制度性質</td>
+                                    <td class="p-3.5 bg-teal-50/30 font-medium text-slate-800">社會保險 (大有數集資)</td>
+                                    <td class="p-3.5 bg-amber-50/30 font-medium text-slate-800">個人儲蓄專戶 (跟著勞工走)</td>
+                                    <td class="p-3.5 bg-sky-50/30 font-medium text-slate-800">社會保險 (無工作者安全網)</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3.5 font-bold text-slate-800 bg-slate-50/50">費用來源</td>
+                                    <td class="p-3.5">雇主70% / 勞工20% / 政府10%</td>
+                                    <td class="p-3.5">雇主至少提繳 6% (勞工可再自提0-6%)</td>
+                                    <td class="p-3.5">保戶60% / 政府補助40%</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3.5 font-bold text-slate-800 bg-slate-50/50">請領條件與年齡</td>
+                                    <td class="p-3.5">滿65歲 (年資滿15年領年金，未滿15年領一次金)</td>
+                                    <td class="p-3.5">年滿 60 歲即可請領 (不論是否繼續工作)</td>
+                                    <td class="p-3.5">年滿 65 歲即可請領</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3.5 font-bold text-slate-800 bg-slate-50/50">領取期限</td>
+                                    <td class="p-3.5 font-semibold text-emerald-600">活多久領多久！無上限</td>
+                                    <td class="p-3.5">領完專戶本金+收益為止 (月領算至平均餘命)</td>
+                                    <td class="p-3.5">活多久領多久！無上限</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3.5 font-bold text-slate-800 bg-slate-50/50">未領完破產或身故</td>
+                                    <td class="p-3.5">遺屬可領「遺屬年金」或「一次給付差額金」</td>
+                                    <td class="p-3.5">專戶餘額由遺屬或指定受益人全數領回</td>
+                                    <td class="p-3.5">遺屬可請領遺屬年金/喪葬給付</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER / AUDIENCE NOTES -->
+        <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800 mt-12">
+            <div class="max-w-6xl mx-auto px-4 text-center space-y-4">
+                <div class="flex items-center justify-center gap-2 text-slate-200 font-bold text-base">
+                    <i class="fa-solid fa-shield-halved text-teal-400"></i> 關心自身權益 · 聰明規劃尊嚴退休人生
+                </div>
+                <p class="text-xs text-slate-500 max-w-2xl mx-auto leading-relaxed">
+                    本互動網頁僅供講座現場解說與資訊參考，實際保險給付金額與年資計算請以勞動部勞工保險局官方個人專戶查詢結果（如使用自然人憑證/行動電話認證登入勞保局e化服務系統）為準。
+                </p>
+                <div class="text-xs text-slate-600">
+                    © 退休權益宣導講座 數位互動教材
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    activeTab: 'qa', // 'qa', 'quiz', 'checker', 'comparison'
+                    searchQuery: '',
+                    selectedCategory: 'all',
+                    expandedQuestions: [1, 6], // Default expanded question IDs
+
+                    // Profile state for Pension Checker
+                    userProfile: {
+                        hasLaborIns: true,
+                        hasLaborPensionNew: true,
+                        hasLaborPensionOld: false,
+                        hasNationalPension: false,
+                        isPartTimeMultiple: false
+                    },
+
+                    // Quiz state
+                    quizStep: 0,
+                    quizSelectedOpt: null,
+                    quizAnswered: false,
+                    quizScore: 0,
+
+                    // Questions database (Mapped precisely from the image provided)
+                    questions: [
+                        {
+                            id: 1,
+                            category: 'pension_count',
+                            categoryName: '退休金筆數',
+                            question: '勞工退休時最多有可能領到多少筆社會保險退休金？',
+                            shortAnswer: '最多可領到 3 筆以上的退休金！',
+                            details: [
+                                { title: '第 1 筆【勞保老年給付】', content: '屬社會保險給付，符合條件可選擇按月領年金或一次請領。' },
+                                { title: '第 2 筆【勞工退休金（勞退）】', content: '屬個人專戶，雇主每月強制提繳6%，年滿60歲即可請領。' },
+                                { title: '第 3 筆【國民年金（國保）】', content: '若職涯中途曾有中斷勞保轉納國保，65歲時可再領一筆國保老年年金！' }
+                            ],
+                            tip: '很多人以為退休只有一筆錢，其實「勞保」跟「勞退」完全是兩回事，兩筆都一定要領！'
+                        },
+                        {
+                            id: 2,
+                            category: 'pension_count',
+                            categoryName: '勞保權益',
+                            question: '勞工保險（勞保）最多可能領到多少筆退休金？',
+                            shortAnswer: '勞保本身為 1 筆「老年給付」（年金或一次金擇一）。',
+                            details: [
+                                { title: '請領方式', content: '勞保年資滿15年者可選擇「老年年金按月領」或「一次請領老年給付」。' },
+                                { title: '注意不可重複請領', content: '勞保老年給付屬於同一保險事故，選定月領或一次領後經核付即不可變更。' }
+                            ],
+                            tip: '月領（老年年金）通常領越久越划算，平均領 7~8 年總額就會超過一次領！'
+                        },
+                        {
+                            id: 3,
+                            category: 'pension_count',
+                            categoryName: '勞退權益',
+                            question: '勞工退休金（勞退）最多可能領到多少筆退休金？',
+                            shortAnswer: '最多有可能領到 2 筆勞退！',
+                            details: [
+                                { title: '勞退舊制（1筆）', content: '適用民國94年7月1日前同一事業單位年資，達退休條件由雇主支付。' },
+                                { title: '勞退新制（1筆）', content: '民國94年7月1日後雇主每月提繳6%至勞保局個人專戶，跟著勞工走。' }
+                            ],
+                            tip: '若您歷經制度變革且保留舊制年資，退休時舊制專戶與新制專戶可各領 1 筆，合計 2 筆！'
+                        },
+                        {
+                            id: 4,
+                            category: 'seniority',
+                            categoryName: '年資計算',
+                            question: '勞保、勞退累積的年資會有浪費掉的狀況嗎？',
+                            shortAnswer: '絕不會浪費！年資都會終身保留與採計。',
+                            details: [
+                                { title: '勞保年資併計國保', content: '勞保年資未滿15年不能領年金？沒關係！65歲時若勞保+國保年資合計滿15年，勞保部分依然可以請領勞保年金！' },
+                                { title: '勞退專戶永遠跟著你', content: '勞退新制專戶是個人所有，換工作也不會消失，累積到60歲隨時可請領。' }
+                            ],
+                            tip: '就算中間中斷工作好幾年，過去繳過的勞保與勞退年資都不會歸零！'
+                        },
+                        {
+                            id: 5,
+                            category: 'seniority',
+                            categoryName: '年資計算',
+                            question: '若請領勞保老年年金，是否有年資不算的狀況？',
+                            shortAnswer: '不會！勞保年資採按月實算，連未滿一年的月數都會按比例精確計算！',
+                            details: [
+                                { title: '按月採計', content: '投保年資未滿1年者，依實際投保月數按比例計算（例如12年5個月，即以 12 + 5/12 年採計）。' },
+                                { title: '唯一限制', content: '僅有「重複加保期間」不能重複累計年資（但兼職月投保薪資可合併計算）。' }
+                            ],
+                            tip: '每多投保一個月，未來的月領年金金額就會增加，每一天都沒有白白浪費。'
+                        },
+                        {
+                            id: 6,
+                            category: 'parttime',
+                            categoryName: '兼職雙重投保',
+                            question: '兼職族可重複投保勞保嗎？',
+                            shortAnswer: '可以！雙重或多重加保，權益大幅提升！',
+                            details: [
+                                { title: '雇主責任', content: '只要有僱傭關係，每一個雇主都依法必須為您申報參加勞保並提繳勞退。' },
+                                { title: '投保薪資合併計算', content: '同時有兩家以上事業單位投保時，請領老年給付的「月投保薪資」可以合併計算（以不超過最高等級為限），退休領更多！' }
+                            ],
+                            tip: '兼職打工族記得請兩邊雇主都為您投保，不僅職災保障加倍，退休金還能變大！'
+                        },
+                        {
+                            id: 7,
+                            category: 'pension_count',
+                            categoryName: '勞保權益',
+                            question: '勞保年金可領多久？有沒有限制？',
+                            shortAnswer: '活多久領多久！完全沒有年限與總額限制。',
+                            details: [
+                                { title: '無上限發給', content: '自申請當月起，按月發給至身故當月止。活到 80 歲領到 80 歲，活到 100 歲領到 100 歲。' },
+                                { title: '抗通膨機制', content: '消費者物價指數(CPI)累計成長率達 5% 時，年金給付金額還會隨之調升！' }
+                            ],
+                            tip: '這就是「年金化」最大的優勢，活得越長領得越多，不必擔心退休金花光。'
+                        },
+                        {
+                            id: 8,
+                            category: 'pension_count',
+                            categoryName: '勞保權益',
+                            question: '勞保年金沒領多久就過世，會不會很虧？',
+                            shortAnswer: '完全不會虧！遺屬可以領回差額金或選擇遺屬年金。',
+                            details: [
+                                { title: '請領「差額金」', content: '若領沒多久不幸過世，遺屬可請領「一次給付應領金額」扣除「已領年金總額」的差額，一毛都不會被沒收！' },
+                                { title: '選擇「遺屬年金」', content: '符合條件的合格遺屬（如配偶、未成年子女），亦可選擇改領半額的遺屬年金。' }
+                            ],
+                            tip: '政府設計有完善的遺屬保障機制，絕對不會讓勞工過去辛苦繳的保費憑空蒸發！'
+                        },
+                        {
+                            id: 9,
+                            category: 'national',
+                            categoryName: '國民年金',
+                            question: '要繳國民年金嗎？會罰嗎？有沒有更好的選擇？',
+                            shortAnswer: '國保是強制險！保持有工作加入「勞保」是更好的選擇！',
+                            details: [
+                                { title: '不繳會怎樣', content: '欠繳保費會計利息，且配偶可能負連帶繳納義務（罰鍰）；逾期太久未繳還會喪失擇優A式給付資格。' },
+                                { title: '更好的選擇', content: '國保保障範圍與給付金額較勞保低。只要設法尋找合規工作或透過工會加入勞保，勞保保障與報酬遠高於國保！' }
+                            ],
+                            tip: '沒工作時收到國保單建議補繳以維持年資；但積極維持勞保身份才是最聰明的退休規劃策略！'
+                        }
+                    ],
+
+                    // Quiz Database
+                    quizQuestions: [
+                        {
+                            question: '勞工退休時，「勞保老年給付」跟「勞工退休金（勞退）」可以同時請領嗎？',
+                            options: [
+                                { text: '不可以，只能二擇一' },
+                                { text: '可以！這是兩種完全不同的制度，兩筆都能領' },
+                                { text: '看雇主願不願意給' }
+                            ],
+                            correct: 1,
+                            explanation: '正確！勞保是「社會保險」，勞退是「個人退休金專戶」，兩者完全獨立，退休時兩筆都可以請領！'
+                        },
+                        {
+                            question: '兼職打工族在兩家公司同時上班，可以兩家都投保勞保嗎？',
+                            options: [
+                                { text: '不行，只能選一家投保' },
+                                { text: '可以重複投保，而且未來請領老年給付時投保薪資可合併計算！' },
+                                { text: '可以投保，但投保薪資不能合併' }
+                            ],
+                            correct: 1,
+                            explanation: '完全正確！兼職雙重投保不僅合規，且在請領老年給付時，兩邊投保薪資可在上限內合併計算，大幅增加月領金額！'
+                        },
+                        {
+                            question: '選擇領「勞保老年年金（月領）」後，如果才領兩年就不幸過世，剩餘的保費會被沒收嗎？',
+                            options: [
+                                { text: '會，沒領完就歸公庫' },
+                                { text: '不會！遺屬可以領取「一次給付扣除已領年金」的差額金，或選遺屬年金' },
+                                { text: '只能領喪葬補助 1 個月' }
+                            ],
+                            correct: 1,
+                            explanation: '不會虧！遺屬可選擇領取一次給付扣除已領總額的「差額金」，或符合資格者改領遺屬年金，保障非常完整。'
+                        },
+                        {
+                            question: '如果勞保年資只有 10 年（未滿 15 年），65 歲時就絕對不能領「勞保老年年金按月領」了嗎？',
+                            options: [
+                                { text: '對，未滿 15 年只能領一次金' },
+                                { text: '不一定！若加上「國民年金」年資滿 15 年，仍可以併計請領勞保年金！' },
+                                { text: '必須重新入職場補滿 15 年' }
+                            ],
+                            correct: 1,
+                            explanation: '答對囉！政府有「勞保併計國保年資」機制，只要兩者年資合計達 15 年，65 歲時勞保部分一樣可以按月領年金！'
+                        },
+                        {
+                            question: '勞保年金按月領，最多可以領到幾歲？',
+                            options: [
+                                { text: '最多領到 80 歲' },
+                                { text: '最多領 20 年' },
+                                { text: '活多久領多久，沒有上限！' }
+                            ],
+                            correct: 2,
+                            explanation: '恭喜答對！勞保老年年金是活多久領多久，活到 100 歲領到 100 歲，抗通膨且無上限。'
+                        }
+                    ]
+                }
+            },
+            computed: {
+                filteredQuestions() {
+                    return this.questions.filter(q => {
+                        const matchCat = this.selectedCategory === 'all' || q.category === this.selectedCategory;
+                        const matchQuery = !this.searchQuery || 
+                            q.question.includes(this.searchQuery) || 
+                            q.shortAnswer.includes(this.searchQuery) ||
+                            q.details.some(d => d.content.includes(this.searchQuery));
+                        return matchCat && matchQuery;
+                    });
+                },
+                calculatedPensions() {
+                    let list = [];
+                    let advice = '';
+
+                    if (this.userProfile.hasLaborIns) {
+                        list.push({
+                            name: '1. 勞工保險 (勞保老年給付)',
+                            desc: '年資滿15年可領老年年金（月領），活多久領多久；未滿15年可一次領或併計國保年資。'
+                        });
+                    }
+
+                    if (this.userProfile.hasLaborPensionNew) {
+                        list.push({
+                            name: '2. 勞工退休金 (勞退新制專戶)',
+                            desc: '雇主每月提繳6%的個人專戶，年滿60歲隨時可請領。'
+                        });
+                    }
+
+                    if (this.userProfile.hasLaborPensionOld) {
+                        list.push({
+                            name: '3. 勞工退休金 (勞退舊制退休金)',
+                            desc: '舊制同一事業單位累積之退休金，符合勞基法條件即可向雇主請領。'
+                        });
+                    }
+
+                    if (this.userProfile.hasNationalPension) {
+                        list.push({
+                            name: '4. 國民年金 (國保老年年金)',
+                            desc: '曾中斷勞保並繳納國保費，年滿65歲可再請領國保老年年金。'
+                        });
+                    }
+
+                    let count = list.length;
+
+                    if (this.userProfile.isPartTimeMultiple) {
+                        advice = '您有兼職雙重投保經歷！請特別注意：申請勞保老年給付時，同時投保兩家的月投保薪資可以併計，這能大幅提高您的勞保月領年金金額喔！';
+                    } else if (count >= 3) {
+                        advice = '太棒了！您的職涯多元，退休時預計可同時請領 3 筆以上的退休金。建議定期登入「勞保局e化服務系統」查看個人專戶累積金額與年資。';
+                    } else if (count === 2) {
+                        advice = '這是最標準的勞工雙軌保障（勞保 + 勞退新制）。建議平時可評估辦理「勞退個人自提 6%」，除了可以節稅，還能讓專戶退休金翻倍！';
+                    } else {
+                        advice = '請確認自身投保狀況，確保雇主有依法為您投保勞保並提繳6%勞退，守護自己的基本退休權益！';
+                    }
+
+                    return {
+                        totalCount: count,
+                        list: list,
+                        advice: advice
+                    };
+                }
+            },
+            methods: {
+                toggleQuestion(id) {
+                    const idx = this.expandedQuestions.indexOf(id);
+                    if (idx > -1) {
+                        this.expandedQuestions.splice(idx, 1);
+                    } else {
+                        this.expandedQuestions.push(id);
+                    }
+                },
+                selectQuizOption(idx) {
+                    if (this.quizAnswered) return;
+                    this.quizSelectedOpt = idx;
+                    this.quizAnswered = true;
+                    if (idx === this.quizQuestions[this.quizStep].correct) {
+                        this.quizScore++;
+                    }
+                },
+                getOptionClass(oIdx) {
+                    if (!this.quizAnswered) {
+                        return 'border-slate-200 bg-white hover:border-teal-500 hover:bg-teal-50/50';
+                    }
+                    if (oIdx === this.quizQuestions[this.quizStep].correct) {
+                        return 'border-emerald-500 bg-emerald-50 text-emerald-900 font-bold';
+                    }
+                    if (this.quizSelectedOpt === oIdx) {
+                        return 'border-rose-500 bg-rose-50 text-rose-900';
+                    }
+                    return 'border-slate-200 bg-white opacity-50';
+                },
+                nextQuizStep() {
+                    this.quizStep++;
+                    this.quizSelectedOpt = null;
+                    this.quizAnswered = false;
+                },
+                resetQuiz() {
+                    this.quizStep = 0;
+                    this.quizSelectedOpt = null;
+                    this.quizAnswered = false;
+                    this.quizScore = 0;
+                },
+                getQuizTitle() {
+                    const total = this.quizScore * 20;
+                    if (total === 100) return '🏆 權益大神！退休金完全難不倒你！';
+                    if (total >= 80) return '👏 退休達人！觀念非常清晰完整！';
+                    if (total >= 60) return '👍 及格通關！關鍵問題大致掌握！';
+                    return '💪 再接再厲！建議多閱讀下方 Q&A 補強觀念！';
+                },
+                getQuizFeedback() {
+                    const total = this.quizScore * 20;
+                    if (total >= 80) {
+                        return '您對勞保、勞退與國保的權益瞭若指掌，懂得善用雙重投保與年資併計，退休後一定能領好領滿！';
+                    } else {
+                        return '退休權益懂不懂差很大！建議多利用網頁中的「9大核心問答」與「退休金檢測器」，把遺漏的眉角補齊！';
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

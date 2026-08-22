@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>退休金動態導航儀 | 互動式資產配置追蹤</title>
+    <!-- 引入 Tailwind CSS 進行美化 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Chart.js 繪製互動圖表 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 引入 FontAwesome 圖示 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 自訂滑桿樣式 */
+        input[type=range] {
+            accent-color: #3b82f6; /* Tailwind blue-500 */
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans leading-normal tracking-normal">
+
+    <nav class="bg-blue-600 p-4 shadow-md text-white">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <h1 class="text-2xl font-bold tracking-wider"><i class="fa-solid fa-compass mr-2"></i> 退休金動態導航儀</h1>
+            <span class="text-sm bg-blue-700 px-3 py-1 rounded-full">年度檢視版</span>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto p-4 md:p-6 mt-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- 左側：輸入與控制面板 -->
+        <div class="lg:col-span-4 space-y-6">
+            
+            <!-- 目標設定區塊 -->
+            <div class="glass-panel p-6 rounded-2xl shadow-lg border border-slate-100">
+                <h2 class="text-lg font-semibold text-blue-700 mb-4 border-b pb-2"><i class="fa-solid fa-flag-checkered mr-2"></i> 1. 終極目標</h2>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1">目標退休金 (萬元)</label>
+                    <input type="number" id="targetAmount" value="2000" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" oninput="calculateAndRender()">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-1">目標退休年齡</label>
+                    <div class="flex items-center gap-4">
+                        <input type="range" id="targetAge" min="50" max="75" value="65" class="w-full" oninput="updateLabel('targetAgeLabel', this.value); calculateAndRender()">
+                        <span id="targetAgeLabel" class="font-bold w-12 text-right">65歲</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-2xl shadow-lg border border-slate-100">
+                <h2 class="text-lg font-semibold text-indigo-700 mb-4 border-b pb-2"><i class="fa-solid fa-location-dot mr-2"></i> 2. 目前進度 (每年更新)</h2>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1">目前年齡</label>
+                    <div class="flex items-center gap-4">
+                        <input type="range" id="currentAge" min="20" max="74" value="40" class="w-full" oninput="updateLabel('currentAgeLabel', this.value); ensureAges(); calculateAndRender()">
+                        <span id="currentAgeLabel" class="font-bold w-12 text-right">40歲</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1">目前已累積資產 (萬元)</label>
+                    <input type="number" id="currentAssets" value="300" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition" oninput="calculateAndRender()">
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-2xl shadow-lg border border-slate-100 bg-blue-50">
+                <h2 class="text-lg font-semibold text-emerald-700 mb-4 border-b border-emerald-200 pb-2"><i class="fa-solid fa-sliders mr-2"></i> 3. 策略調整 (動態模擬)</h2>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1">未來每年投入金額 (萬元)</label>
+                    <div class="flex items-center gap-4">
+                        <input type="range" id="annualContribution" min="0" max="300" step="1" value="36" class="w-full accent-emerald-500" oninput="updateLabel('contributionLabel', this.value); calculateAndRender()">
+                        <span id="contributionLabel" class="font-bold w-12 text-right text-emerald-700">36萬</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1 flex justify-between">
+                        <span>預期年化報酬率</span>
+                        <span class="text-xs text-slate-500">(代表資產配置風險)</span>
+                    </label>
+                    <div class="flex items-center gap-4">
+                        <input type="range" id="returnRate" min="0" max="15" step="0.5" value="6.0" class="w-full accent-emerald-500" oninput="updateLabel('returnLabel', this.value + '%'); calculateAndRender()">
+                        <span id="returnLabel" class="font-bold w-12 text-right text-emerald-700">6.0%</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-slate-400 mt-1 px-1">
+                        <span>定存/債券 (低風險)</span>
+                        <span>股票/ETF (高風險)</span>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="lg:col-span-8 flex flex-col gap-6">
+            
+            <!-- 診斷結果卡片 -->
+            <div id="insightCard" class="p-6 rounded-2xl shadow-lg transition-all duration-300 transform">
+                <div class="flex items-start gap-4">
+                    <div id="insightIcon" class="text-4xl mt-1"></div>
+                    <div>
+                        <h3 id="insightTitle" class="text-xl font-bold mb-2">系統分析中...</h3>
+                        <p id="insightMessage" class="text-slate-700 leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 圖表區塊 -->
+            <div class="glass-panel p-6 rounded-2xl shadow-lg border border-slate-100 flex-grow flex flex-col">
+                <h2 class="text-lg font-semibold mb-4 text-slate-700"><i class="fa-solid fa-chart-line mr-2"></i> 資產成長軌跡預測</h2>
+                <div class="relative flex-grow min-h-[400px]">
+                    <canvas id="projectionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 數據摘要 -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow text-center border-t-4 border-indigo-400">
+                    <div class="text-xs text-slate-500 mb-1">準備時間</div>
+                    <div class="text-2xl font-bold text-slate-700" id="summaryYears">0 年</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow text-center border-t-4 border-emerald-400">
+                    <div class="text-xs text-slate-500 mb-1">預計總投入成本</div>
+                    <div class="text-2xl font-bold text-slate-700" id="summaryPrincipal">0 萬</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow text-center border-t-4 border-amber-400">
+                    <div class="text-xs text-slate-500 mb-1">預計投資收益</div>
+                    <div class="text-2xl font-bold text-slate-700" id="summaryInterest">0 萬</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow text-center border-t-4 border-blue-500">
+                    <div class="text-xs text-slate-500 mb-1">退休時預估總資產</div>
+                    <div class="text-2xl font-bold text-blue-700" id="summaryFinal">0 萬</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let myChart = null;
+
+        // 更新滑桿旁的數值標籤
+        function updateLabel(id, value) {
+            document.getElementById(id).innerText = value;
+        }
+
+        // 確保目前年齡不超過目標退休年齡
+        function ensureAges() {
+            let currentAge = parseInt(document.getElementById('currentAge').value);
+            let targetAge = parseInt(document.getElementById('targetAge').value);
+            if (currentAge >= targetAge) {
+                document.getElementById('targetAge').value = currentAge + 1;
+                updateLabel('targetAgeLabel', currentAge + 1 + '歲');
+            }
+        }
+
+        // 核心計算與畫面更新邏輯
+        function calculateAndRender() {
+            // 1. 取得所有輸入值
+            const targetAmount = parseFloat(document.getElementById('targetAmount').value) || 0;
+            const targetAge = parseInt(document.getElementById('targetAge').value);
+            const currentAge = parseInt(document.getElementById('currentAge').value);
+            const currentAssets = parseFloat(document.getElementById('currentAssets').value) || 0;
+            const annualContribution = parseFloat(document.getElementById('annualContribution').value) || 0;
+            const returnRate = parseFloat(document.getElementById('returnRate').value) / 100;
+
+            const yearsToRetire = targetAge - currentAge;
+
+            // 2. 建立圖表數據陣列
+            let labels = [];
+            let projectedData = [];
+            let targetData = [];
+            
+            let currentBalance = currentAssets;
+            let totalPrincipal = currentAssets;
+
+            for (let year = 0; year <= yearsToRetire; year++) {
+                let age = currentAge + year;
+                labels.push(age + '歲');
+                
+                if (year > 0) {
+                    // 年初投入，年底計算利息 (簡化模型)
+                    currentBalance = (currentBalance + annualContribution) * (1 + returnRate);
+                    totalPrincipal += annualContribution;
+                }
+                
+                projectedData.push(Math.round(currentBalance));
+                targetData.push(targetAmount);
+            }
+
+            const finalAmount = Math.round(currentBalance);
+            const totalInterest = finalAmount - totalPrincipal;
+
+            document.getElementById('summaryYears').innerText = yearsToRetire + ' 年';
+            document.getElementById('summaryPrincipal').innerText = Math.round(totalPrincipal) + ' 萬';
+            document.getElementById('summaryInterest').innerText = Math.round(totalInterest) + ' 萬';
+            document.getElementById('summaryFinal').innerText = finalAmount + ' 萬';
+
+            // 3. 智慧診斷邏輯 (判斷超前或落後)
+            analyzeProgress(finalAmount, targetAmount, yearsToRetire, currentAssets, annualContribution, returnRate);
+
+            // 4. 更新圖表
+            renderChart(labels, projectedData, targetData, currentAge);
+        }
+
+        function analyzeProgress(final, target, years, assets, contribution, rate) {
+            const card = document.getElementById('insightCard');
+            const icon = document.getElementById('insightIcon');
+            const title = document.getElementById('insightTitle');
+            const message = document.getElementById('insightMessage');
+
+            // 淨值差異比例
+            const ratio = final / target;
+
+            if (ratio >= 1.05) {
+                // 情境 A：超前部署 (可以降低風險)
+                card.className = "p-6 rounded-2xl shadow-lg transition-all duration-300 transform bg-green-50 border-l-8 border-green-500";
+                icon.innerHTML = '<i class="fa-solid fa-face-laugh-beam text-green-500"></i>';
+                title.className = "text-xl font-bold mb-2 text-green-700";
+                title.innerText = "太棒了！您已經超前進度";
+                
+                // 計算達標所需的最低安全報酬率
+                let requiredRate = findRequiredRate(target, years, assets, contribution);
+                if(requiredRate < 0) requiredRate = 0; // 避免負利率顯示
+                
+                message.innerHTML = `預估退休時將累積 <b>${final} 萬元</b>，超越目標！<br>
+                                     <span class="text-green-800 font-semibold mt-2 block bg-green-100 p-3 rounded">
+                                     💡 <b>資產配置建議：</b> 您可以考慮將資產轉移至更安全的標的（如定存、高評級債券）。
+                                     您的年化報酬率只要達到 <b>${(requiredRate*100).toFixed(1)}%</b> 就足以順利達標，無需承擔不必要的市場風險！</span>`;
+                                     
+            } else if (ratio >= 0.9) {
+                // 情境 B：進度符合預期 (稍微差一點點或剛好)
+                card.className = "p-6 rounded-2xl shadow-lg transition-all duration-300 transform bg-blue-50 border-l-8 border-blue-500";
+                icon.innerHTML = '<i class="fa-solid fa-thumbs-up text-blue-500"></i>';
+                title.className = "text-xl font-bold mb-2 text-blue-700";
+                title.innerText = "穩紮穩打！目前進度在軌道上";
+                message.innerHTML = `預估退休時將累積 <b>${final} 萬元</b>，非常接近目標。<br>請保持目前的儲蓄與投資紀律，每年定期檢視即可。`;
+            } else {
+                // 情境 C：進度落後 (需要調整參數)
+                card.className = "p-6 rounded-2xl shadow-lg transition-all duration-300 transform bg-red-50 border-l-8 border-red-500";
+                icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-500"></i>';
+                title.className = "text-xl font-bold mb-2 text-red-700";
+                title.innerText = "注意！目前進度落後目標";
+                
+                // 計算解方 1: 需要提高多少年投入
+                let reqContribution = findRequiredContribution(target, years, assets, rate);
+                
+                // 計算解方 2: 需要延後幾年退休
+                let extraYears = findRequiredYears(target, assets, contribution, rate) - years;
+
+                message.innerHTML = `預估退休時僅能累積 <b>${final} 萬元</b>，距離目標還有 ${(target-final)} 萬的缺口。<br>
+                                     <span class="text-red-800 font-semibold mt-3 block bg-red-100 p-3 rounded">
+                                     💡 <b>您可以採取的行動：</b><br>
+                                     1. <b>提高投入：</b> 將每年投入金額提高至 <b>${Math.ceil(reqContribution)} 萬元</b>。<br>
+                                     2. <b>拉長跑道：</b> 保持目前投入，但將退休年齡延後 <b>${Math.max(1, extraYears)} 年</b>。
+                                     </span>
+                                     (或者，您也可以嘗試在「策略調整」區塊中，適度調高一點預期報酬率來模擬看看)`;
+            }
+        }
+
+        /* 輔助計算函數：使用迭代法尋找達標所需最低報酬率 */
+        function findRequiredRate(target, years, currentAssets, annualContribution) {
+            let low = -0.10; // -10%
+            let high = 0.20; // 20%
+            let mid = 0;
+            for(let i=0; i<30; i++) { // 跑 30 次二元搜尋足夠精確
+                mid = (low + high) / 2;
+                let balance = currentAssets;
+                for(let y=1; y<=years; y++) {
+                    balance = (balance + annualContribution) * (1 + mid);
+                }
+                if(balance > target) high = mid;
+                else low = mid;
+            }
+            return mid;
+        }
+
+        /* 輔助計算函數：計算達標所需每年投入金 (代數反推，或直接迭代求解) */
+        function findRequiredContribution(target, years, currentAssets, rate) {
+            if(years === 0) return 0;
+            let low = 0;
+            let high = target; // 極端值
+            let mid = 0;
+            for(let i=0; i<30; i++) {
+                mid = (low + high) / 2;
+                let balance = currentAssets;
+                for(let y=1; y<=years; y++) {
+                    balance = (balance + mid) * (1 + rate);
+                }
+                if(balance > target) high = mid;
+                else low = mid;
+            }
+            return mid;
+        }
+
+        /* 輔助計算函數：計算達標所需總年數 */
+        function findRequiredYears(target, currentAssets, annualContribution, rate) {
+            let balance = currentAssets;
+            let years = 0;
+            while(balance < target && years < 60) { // 設個上限防死迴圈
+                years++;
+                balance = (balance + annualContribution) * (1 + rate);
+            }
+            return years;
+        }
+
+        function renderChart(labels, projectedData, targetData, currentAge) {
+            const ctx = document.getElementById('projectionChart').getContext('2d');
+            
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            // 建立漸層填充
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.5)'); // blue-500
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '預估資產累積 (萬元)',
+                            data: projectedData,
+                            borderColor: '#3b82f6', // blue-500
+                            backgroundColor: gradient,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#3b82f6',
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: '退休金目標',
+                            data: targetData,
+                            borderColor: '#f43f5e', // rose-500
+                            borderWidth: 2,
+                            borderDash: [5, 5], // 虛線
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { font: { family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif" } }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 14 },
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('zh-TW').format(context.parsed.y) + ' 萬';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#e2e8f0' },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + ' 萬';
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+        }
+
+        // 初始化執行一次
+        window.onload = function() {
+            calculateAndRender();
+        };
+    </script>
+</body>
+</html>
