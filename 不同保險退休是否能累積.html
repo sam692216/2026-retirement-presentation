@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>跨制度退休金年資合併與請領教學系統</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts Inter & Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans TC', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom scrollbar for touch UX */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .touch-action-manipulation {
+            touch-action: manipulation;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col" x-data="appData()" x-init="initApp()">
+
+    <!-- Navigation Header -->
+    <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-3">
+            <div class="flex items-center space-x-3 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-sky-500 p-2 rounded-xl text-white shadow-lg">
+                        <i data-lucide="layers" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                            退休金年資「能不能合併？」
+                            <span class="bg-sky-500/30 text-sky-300 text-xs px-2 py-0.5 rounded-full font-normal border border-sky-400/30">2026 互動教學神器</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">專為勞保、國保、農保、公保跨制度年資釐清設計</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                <!-- Tab Navigation (Optimized for Touch/iPad) -->
+                <nav class="flex bg-slate-800/80 p-1 rounded-xl w-full md:w-auto overflow-x-auto touch-action-manipulation text-sm">
+                    <button @click="activeTab = 'matrix'" 
+                            :class="activeTab === 'matrix' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'" 
+                            class="flex-1 md:flex-none px-4 py-2 rounded-lg font-medium transition flex items-center justify-center gap-2 whitespace-nowrap">
+                        <i data-lucide="grid" class="w-4 h-4"></i>
+                        雙制度對照矩陣
+                    </button>
+                    <button @click="activeTab = 'simulator'" 
+                            :class="activeTab === 'simulator' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'" 
+                            class="flex-1 md:flex-none px-4 py-2 rounded-lg font-medium transition flex items-center justify-center gap-2 whitespace-nowrap">
+                        <i data-lucide="calculator" class="w-4 h-4"></i>
+                        職涯模擬器
+                    </button>
+                    <button @click="activeTab = 'cases'" 
+                            :class="activeTab === 'cases' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'" 
+                            class="flex-1 md:flex-none px-4 py-2 rounded-lg font-medium transition flex items-center justify-center gap-2 whitespace-nowrap">
+                        <i data-lucide="help-circle" class="w-4 h-4"></i>
+                        情境考題與案例
+                    </button>
+                    <button @click="activeTab = 'cheatsheet'" 
+                            :class="activeTab === 'cheatsheet' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'" 
+                            class="flex-1 md:flex-none px-4 py-2 rounded-lg font-medium transition flex items-center justify-center gap-2 whitespace-nowrap">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                        觀念懶人包
+                    </button>
+                </nav>
+
+                <!-- Line CTA Header Button -->
+                <a href="https://lin.ee/YGTARlx" target="_blank" rel="noopener" class="hidden sm:flex bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold px-3.5 py-2 rounded-xl items-center gap-1.5 transition shadow-sm whitespace-nowrap shrink-0">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i>
+                    <span>找阿福教練諮詢</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1 w-full">
+
+        <!-- TAB 1: 雙制度對照矩陣 (Matrix Inspector) -->
+        <section x-show="activeTab === 'matrix'" x-transition class="space-y-6">
+            <!-- Teaching Hint Card -->
+            <div class="bg-gradient-to-r from-sky-900 to-slate-900 text-white p-5 rounded-2xl shadow-md border border-sky-800/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-start space-x-3">
+                    <div class="p-2 bg-sky-500/20 text-sky-300 rounded-lg shrink-0 mt-0.5">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-base text-sky-200">教學提示：年資併計的核心口訣</h2>
+                        <p class="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed">
+                            「<span class="text-amber-300 font-bold">資格可以併計，給付各自計算；農保具有排他，公勞雙軌獨立。</span>」點選下方任意兩種制度，為學員剖析詳細細節！
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selector & Interactive Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left: System Pickers -->
+                <div class="lg:col-span-5 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between space-y-5">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2 mb-4">
+                            <i data-lucide="sliders" class="w-5 h-5 text-sky-600"></i>
+                            選擇兩種制度進行對照
+                        </h3>
+                        
+                        <!-- System A Select -->
+                        <div class="space-y-2 mb-4">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">制度一 (System 1)</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <template x-for="sys in systems" :key="sys.id">
+                                    <button @click="sysA = sys.id" 
+                                            :class="sysA === sys.id ? 'bg-sky-50 border-sky-500 text-sky-700 font-bold ring-2 ring-sky-500/20' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'"
+                                            class="p-3 rounded-xl border text-center text-xs sm:text-sm transition touch-action-manipulation flex flex-col items-center justify-center gap-1">
+                                        <span x-text="sys.icon" class="text-lg"></span>
+                                        <span x-text="sys.name"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- System B Select -->
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">制度二 (System 2)</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <template x-for="sys in systems" :key="sys.id">
+                                    <button @click="sysB = sys.id" 
+                                            :class="sysB === sys.id ? 'bg-sky-50 border-sky-500 text-sky-700 font-bold ring-2 ring-sky-500/20' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'"
+                                            class="p-3 rounded-xl border text-center text-xs sm:text-sm transition touch-action-manipulation flex flex-col items-center justify-center gap-1">
+                                        <span x-text="sys.icon" class="text-lg"></span>
+                                        <span x-text="sys.name"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Matrix Visual Indicator -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 text-xs space-y-2">
+                        <div class="font-semibold text-slate-700 flex justify-between">
+                            <span>當前選擇組合:</span>
+                            <span class="text-sky-600 font-bold" x-text="getSystemName(sysA) + ' ⚡ ' + getSystemName(sysB)"></span>
+                        </div>
+                        <p class="text-slate-500">提示：如果在 iPad 示範，直接點擊下方卡片即可向學員展示判定結果。</p>
+                    </div>
+                </div>
+
+                <!-- Right: Detailed Comparison Result -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+                    <div class="flex items-center justify-between border-b pb-4 border-slate-100">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-3xl" x-text="getSystemIcon(sysA) + ' + ' + getSystemIcon(sysB)"></span>
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-900" x-text="getSystemName(sysA) + ' 與 ' + getSystemName(sysB)"></h3>
+                                <p class="text-xs text-slate-500">年資合併與請領規則分析</p>
+                            </div>
+                        </div>
+                        <span :class="getComparisonResult().canCombine ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-amber-100 text-amber-800 border-amber-300'"
+                              class="px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-1">
+                            <i :data-lucide="getComparisonResult().canCombine ? 'check-circle-2' : 'alert-circle'" class="w-4 h-4"></i>
+                            <span x-text="getComparisonResult().combineBadge"></span>
+                        </span>
+                    </div>
+
+                    <!-- Key Verdict Cards Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Card 1: 資格門檻 -->
+                        <div class="p-4 rounded-xl border bg-slate-50 space-y-2">
+                            <div class="text-xs font-bold text-slate-500 flex items-center gap-1">
+                                <i data-lucide="shield-check" class="w-4 h-4 text-sky-600"></i>
+                                年資併計資格
+                            </div>
+                            <div class="text-sm font-bold text-slate-800" x-text="getComparisonResult().qualifyText"></div>
+                            <p class="text-xs text-slate-500 leading-relaxed" x-text="getComparisonResult().qualifyDesc"></p>
+                        </div>
+
+                        <!-- Card 2: 給付計算 -->
+                        <div class="p-4 rounded-xl border bg-slate-50 space-y-2">
+                            <div class="text-xs font-bold text-slate-500 flex items-center gap-1">
+                                <i data-lucide="coins" class="w-4 h-4 text-amber-600"></i>
+                                給付計算方式
+                            </div>
+                            <div class="text-sm font-bold text-slate-800" x-text="getComparisonResult().calcText"></div>
+                            <p class="text-xs text-slate-500 leading-relaxed" x-text="getComparisonResult().calcDesc"></p>
+                        </div>
+
+                        <!-- Card 3: 排他/衝突限制 -->
+                        <div class="p-4 rounded-xl border bg-slate-50 space-y-2">
+                            <div class="text-xs font-bold text-slate-500 flex items-center gap-1">
+                                <i data-lucide="slash" class="w-4 h-4 text-rose-600"></i>
+                                排他條款與衝突
+                            </div>
+                            <div class="text-sm font-bold text-slate-800" x-text="getComparisonResult().conflictText"></div>
+                            <p class="text-xs text-slate-500 leading-relaxed" x-text="getComparisonResult().conflictDesc"></p>
+                        </div>
+                    </div>
+
+                    <!-- Teacher Focus Section (專為教學設計) -->
+                    <div class="bg-amber-50/70 border border-amber-200 p-5 rounded-xl space-y-2">
+                        <h4 class="font-bold text-amber-900 text-sm flex items-center gap-2">
+                            <i data-lucide="graduation-cap" class="w-5 h-5 text-amber-600"></i>
+                            講師教學重點與眉角 (Teacher's Focus)
+                        </h4>
+                        <div class="text-xs sm:text-sm text-amber-950 space-y-1.5 leading-relaxed font-normal" x-html="getComparisonResult().teacherNotes"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: 職涯跨界年資試算模擬器 (Career Builder) -->
+        <section x-show="activeTab === 'simulator'" x-transition class="space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 border-slate-100 gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="user-check" class="w-6 h-6 text-sky-600"></i>
+                            學員個人跨界職涯年資模擬器
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">在 iPad 上為學員建立個人投保履歷，自動診斷 65 歲退休時的年資資格與請領方式。</p>
+                    </div>
+
+                    <button @click="resetCareer()" class="text-xs text-slate-500 hover:text-rose-600 flex items-center gap-1 underline transition">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> 重置模擬器
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6">
+                    <!-- Left: Inputs and Timeline Adder -->
+                    <div class="lg:col-span-5 space-y-6">
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                    <i data-lucide="plus-circle" class="w-4 h-4 text-sky-600"></i>
+                                    新增投保階段
+                                </h3>
+                                <button @click="showInfoModal = true; $nextTick(() => lucide.createIcons())" type="button" class="text-xs bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold px-2.5 py-1.5 rounded-xl border border-sky-300 flex items-center gap-1 transition shadow-sm touch-action-manipulation">
+                                    <i data-lucide="info" class="w-3.5 h-3.5 text-sky-600"></i>
+                                    <span>制度特性與投保說明</span>
+                                </button>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-600 mb-1 block">選擇保險/退休制度</label>
+                                    <select x-model="newRecord.system" @change="onSystemChange()" class="w-full p-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-sky-500 focus:outline-none font-bold text-slate-800">
+                                        <option value="labor">💼 勞保 (勞工保險 · 最高45,800)</option>
+                                        <option value="national">🇹🇼 國保 (國民年金 · 固定20,952)</option>
+                                        <option value="pension">💰 勞退新制 (個人專戶 · 最高150,000)</option>
+                                        <option value="civil">🏛️ 公保 (公教人員保險 · 本俸制)</option>
+                                        <option value="farmer">🌾 農保 (農民健康保險 · 固定20,400)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="text-xs font-semibold text-slate-600 mb-1 block">投保年資 (年)</label>
+                                    <div class="flex items-center space-x-3">
+                                        <input type="range" min="1" max="30" x-model.number="newRecord.years" class="w-full accent-sky-600">
+                                        <span class="font-bold text-sky-700 text-base w-12 text-right" x-text="newRecord.years + ' 年'"></span>
+                                    </div>
+                                </div>
+
+                                <!-- 投保薪資智能選單 -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="text-xs font-semibold text-slate-600" x-text="getSalaryLabel()"></label>
+                                        <span class="text-[11px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded border border-sky-200" x-text="getSalaryBadge()"></span>
+                                    </div>
+
+                                    <!-- 勞保級距下拉選單 -->
+                                    <template x-if="newRecord.system === 'labor'">
+                                        <select x-model.number="newRecord.salary" class="w-full p-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-sky-500 focus:outline-none font-bold text-slate-800">
+                                            <option value="45800">第 11 級：45,800 元 (上限天花板)</option>
+                                            <option value="43900">第 10 級：43,900 元</option>
+                                            <option value="42000">第 09 級：42,000 元</option>
+                                            <option value="40100">第 08 級：40,100 元</option>
+                                            <option value="38200">第 07 級：38,200 元</option>
+                                            <option value="36300">第 06 級：36,300 元</option>
+                                            <option value="34800">第 05 級：34,800 元</option>
+                                            <option value="33300">第 04 級：33,300 元</option>
+                                            <option value="31800">第 03 級：31,800 元</option>
+                                            <option value="30300">第 02 級：30,300 元</option>
+                                            <option value="29500">第 01 級：29,500 元 (2026 最低工資)</option>
+                                        </select>
+                                    </template>
+
+                                    <!-- 國保固定投保金額 (唯讀顯示) -->
+                                    <template x-if="newRecord.system === 'national'">
+                                        <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-100 text-sm font-bold text-slate-700 flex items-center justify-between">
+                                            <span>20,952 元 (法定單一月投保金額)</span>
+                                            <span class="text-xs font-normal text-slate-500">依法固定</span>
+                                        </div>
+                                    </template>
+
+                                    <!-- 農保固定投保金額 (唯讀顯示) -->
+                                    <template x-if="newRecord.system === 'farmer'">
+                                        <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-100 text-sm font-bold text-slate-700 flex items-center justify-between">
+                                            <span>20,400 元 (法定單一月投保金額)</span>
+                                            <span class="text-xs font-normal text-slate-500">老農津貼8,110元</span>
+                                        </div>
+                                    </template>
+
+                                    <!-- 公保本俸級距選單 -->
+                                    <template x-if="newRecord.system === 'civil'">
+                                        <select x-model.number="newRecord.salary" class="w-full p-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-sky-500 focus:outline-none font-bold text-slate-800">
+                                            <option value="61000">簡任高階本俸：61,000 元 (上限)</option>
+                                            <option value="55000">簡任十至十一職等本俸：55,000 元</option>
+                                            <option value="48000">薦任八至九職等本俸：48,000 元</option>
+                                            <option value="42000">薦任七職等/中階教師本俸：42,000 元</option>
+                                            <option value="35000">委任五職等/初任教師本俸：35,000 元</option>
+                                            <option value="28000">委任三至四職等本俸：28,000 元</option>
+                                            <option value="21800">委任一職等本俸：21,800 元</option>
+                                        </select>
+                                    </template>
+
+                                    <!-- 勞退新制提繳級距選單 (最高可達15萬) -->
+                                    <template x-if="newRecord.system === 'pension'">
+                                        <select x-model.number="newRecord.salary" class="w-full p-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-sky-500 focus:outline-none font-bold text-slate-800">
+                                            <option value="150000">第 60 級：150,000 元 (最高上限天花板)</option>
+                                            <option value="120000">高薪組：120,000 元</option>
+                                            <option value="100000">高薪組：100,000 元</option>
+                                            <option value="80000">中高薪組：80,000 元</option>
+                                            <option value="60000">中薪組：60,000 元</option>
+                                            <option value="45800">第 34 級：45,800 元 (勞保上限對應)</option>
+                                            <option value="38200">第 29 級：38,200 元</option>
+                                            <option value="29500">第 21 級：29,500 元 (最低工資起點)</option>
+                                        </select>
+                                    </template>
+
+                                    <!-- 動態說明備註 -->
+                                    <p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed bg-white p-2 rounded-lg border border-slate-200/80" x-html="getSystemTip()"></p>
+                                </div>
+
+                                <button @click="addCareerRecord()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-sm flex items-center justify-center gap-2 touch-action-manipulation">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    加入職涯歷程
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Timeline History List -->
+                        <div class="space-y-3">
+                            <h3 class="font-bold text-slate-800 text-sm flex items-center justify-between">
+                                <span>已建立的職涯履歷表</span>
+                                <span class="text-xs text-sky-600 font-semibold" x-text="'總年資：' + getTotalCareerYears() + ' 年'"></span>
+                            </h3>
+
+                            <template x-if="careerList.length === 0">
+                                <div class="text-center py-8 bg-slate-50 border border-dashed rounded-xl text-slate-400 text-xs">
+                                    尚無新增階段，請點擊上方按鈕加入年資。
+                                </div>
+                            </template>
+
+                            <div class="space-y-2">
+                                <template x-for="(item, index) in careerList" :key="index">
+                                    <div class="flex items-center justify-between p-3.5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-sky-300 transition">
+                                        <div class="flex items-center space-x-3">
+                                            <span x-text="getSystemIcon(item.system)" class="text-xl"></span>
+                                            <div>
+                                                <div class="font-bold text-sm text-slate-800" x-text="getSystemName(item.system)"></div>
+                                                <div class="text-xs text-slate-500" x-text="'平均薪資: $' + item.salary.toLocaleString() + ' 元'"></div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <span class="font-extrabold text-sky-700 text-sm bg-sky-50 px-2.5 py-1 rounded-lg border border-sky-100" x-text="item.years + ' 年'"></span>
+                                            <button @click="removeCareerRecord(index)" class="text-slate-400 hover:text-rose-500 transition p-1">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Analysis Output Report -->
+                    <div class="lg:col-span-7 bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-6">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2 border-b pb-3 border-slate-200">
+                            <i data-lucide="clipboard-check" class="w-5 h-5 text-emerald-600"></i>
+                            退休請領資格綜合診斷報告 (受試對象年滿 65 歲)
+                        </h3>
+
+                        <!-- Verdict Cards -->
+                        <div class="space-y-4">
+                            <!-- Labor Pension Verdict -->
+                            <div class="bg-white p-4 rounded-xl border shadow-sm space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                                        💼 勞保老年給付 (Labor Insurance)
+                                    </span>
+                                    <span :class="getLaborVerdict().qualified ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'" 
+                                          class="text-xs font-bold px-2.5 py-1 rounded-full" x-text="getLaborVerdict().badge"></span>
+                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed" x-text="getLaborVerdict().description"></p>
+                                <template x-if="getLaborVerdict().estimatedMonthly > 0">
+                                    <div class="text-xs font-bold text-emerald-700 bg-emerald-50 p-2 rounded-lg border border-emerald-100">
+                                        預估勞保年金月領金額：約 $<span x-text="getLaborVerdict().estimatedMonthly.toLocaleString()"></span> 元 / 月
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- National Pension Verdict -->
+                            <div class="bg-white p-4 rounded-xl border shadow-sm space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                                        🇹🇼 國保老年年金 (National Pension)
+                                    </span>
+                                    <span :class="getNationalVerdict().qualified ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'" 
+                                          class="text-xs font-bold px-2.5 py-1 rounded-full" x-text="getNationalVerdict().badge"></span>
+                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed" x-text="getNationalVerdict().description"></p>
+                            </div>
+
+                            <!-- Farmer Pension Verdict -->
+                            <div class="bg-white p-4 rounded-xl border shadow-sm space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                                        🌾 農保 / 老農津貼 (Farmer Allowance)
+                                    </span>
+                                    <span :class="getFarmerVerdict().conflict ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'" 
+                                          class="text-xs font-bold px-2.5 py-1 rounded-full" x-text="getFarmerVerdict().badge"></span>
+                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed" x-text="getFarmerVerdict().description"></p>
+                            </div>
+                        </div>
+
+                        <!-- Teaching Key Takeaway Box -->
+                        <div class="bg-sky-900 text-white p-4 rounded-xl space-y-2">
+                            <div class="font-bold text-xs text-sky-300 flex items-center gap-1">
+                                <i data-lucide="lightbulb" class="w-4 h-4"></i>
+                                給學員的解答金句：
+                            </div>
+                            <p class="text-xs sm:text-sm text-slate-200 leading-relaxed" x-text="getOverallTakeaway()"></p>
+                        </div>
+
+                        <!-- 阿福教練個人品牌與一對一諮詢卡片 (Coach Fu CTA Card) -->
+                        <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-sky-950 rounded-2xl p-5 text-white shadow-lg border border-sky-500/30 space-y-4">
+                            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                                <div class="relative shrink-0">
+                                    <img src="阿福教練IP.jpg" alt="沈明福 經理 (阿福教練)" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-amber-400 shadow-md">
+                                    <img src="阿福教練個人IP.jpg" alt="阿福教練 IP" class="w-7 h-7 rounded-full border-2 border-white absolute -bottom-1.5 -right-1.5 shadow bg-white">
+                                </div>
+                                <div class="space-y-1.5 text-center sm:text-left flex-1">
+                                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                                        <h4 class="text-base font-bold text-white">沈明福 經理 (阿福教練)</h4>
+                                        <span class="text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full">大勝管顧 執行長</span>
+                                    </div>
+                                    <p class="text-xs text-sky-200 font-medium">IARFC 國際認證財務顧問師 · 國立高雄科技大學 金融資訊系業師</p>
+                                    <p class="text-xs text-slate-300 leading-relaxed pt-1">
+                                        年資跨越勞保、國保、公保或農保？想知道自己的黃金請領年齡與缺口補足方案？歡迎加 LINE 預約一對一客製化退休金健診！
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-1">
+                                <a href="https://lin.ee/YGTARlx" target="_blank" rel="noopener" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-black py-3 px-4 rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 touch-action-manipulation">
+                                    <i data-lucide="message-circle" class="w-5 h-5"></i>
+                                    <span>加 LINE 找阿福教練 · 預約免費一對一退休金諮詢</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: 情境考題與實戰案例 (Cases & Quiz) -->
+        <section x-show="activeTab === 'cases'" x-transition class="space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 border-slate-100 gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="help-circle" class="w-6 h-6 text-sky-600"></i>
+                            教學實戰情境考題 & 經典個案解密
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">適合課堂互動問答，點擊選項立即揭曉盲點與完整法規剖析！</p>
+                    </div>
+
+                    <!-- Quiz Score Tracker -->
+                    <div class="bg-sky-50 border border-sky-200 px-4 py-2 rounded-xl text-xs font-bold text-sky-800 flex items-center gap-2">
+                        <i data-lucide="award" class="w-4 h-4 text-sky-600"></i>
+                        <span>答對率：<span x-text="quizCorrectCount"></span> / <span x-text="quizList.length"></span> 題</span>
+                    </div>
+                </div>
+
+                <!-- Case List Accordion/Cards -->
+                <div class="grid grid-cols-1 gap-6 mt-6">
+                    <template x-for="(q, idx) in quizList" :key="q.id">
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm hover:border-sky-200 transition">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex items-start space-x-3">
+                                    <span class="bg-sky-600 text-white font-black text-xs px-2.5 py-1 rounded-lg shrink-0 mt-0.5" x-text="'案例 ' + (idx + 1)"></span>
+                                    <div>
+                                        <h3 class="font-bold text-base text-slate-900" x-text="q.title"></h3>
+                                        <p class="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed" x-text="q.scenario"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Options Buttons -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+                                <template x-for="(opt, optIdx) in q.options" :key="optIdx">
+                                    <button @click="answerQuiz(q.id, optIdx)" 
+                                            :disabled="q.userAnswer !== null"
+                                            :class="getOptionStyle(q, optIdx)"
+                                            class="p-3 text-left text-xs sm:text-sm rounded-xl border transition flex items-center justify-between touch-action-manipulation">
+                                        <span x-text="opt.text" class="font-medium"></span>
+                                        <template x-if="q.userAnswer !== null && optIdx === q.correctIdx">
+                                            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+                                        </template>
+                                    </button>
+                                </template>
+                            </div>
+
+                            <!-- Answer Explanation Box -->
+                            <template x-if="q.userAnswer !== null">
+                                <div :class="q.userAnswer === q.correctIdx ? 'bg-emerald-50 border-emerald-200 text-emerald-950' : 'bg-rose-50 border-rose-200 text-rose-950'"
+                                     class="p-4 rounded-xl border text-xs sm:text-sm space-y-2 mt-3 animate-fadeIn">
+                                    <div class="font-bold flex items-center gap-1.5">
+                                        <i :data-lucide="q.userAnswer === q.correctIdx ? 'check' : 'x'" class="w-4 h-4"></i>
+                                        <span x-text="q.userAnswer === q.correctIdx ? '回答正確！' : '回答錯誤！'"></span>
+                                    </div>
+                                    <div class="leading-relaxed text-xs sm:text-sm" x-html="q.explanation"></div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: 觀念懶人包 (Cheat Sheet) -->
+        <section x-show="activeTab === 'cheatsheet'" x-transition class="space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <i data-lucide="book-open" class="w-6 h-6 text-sky-600"></i>
+                        跨制度年資合併與退休規劃金律（懶人包）
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">彙整四大社會保險與職業退休金關鍵差異，上課投影片必備素材。</p>
+                </div>
+
+                <!-- 3 Golden Rules Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200 p-5 rounded-2xl space-y-2">
+                        <div class="w-8 h-8 bg-sky-600 text-white font-black rounded-lg flex items-center justify-center text-sm shadow-sm">1</div>
+                        <h3 class="font-bold text-slate-900 text-base">資格併計 ≠ 給付相加</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            勞保與國保年資可以併計達到 15 年門檻（取得 65 歲領年金資格），但計算金額時，<span class="font-bold text-sky-700">勞保算勞保的、國保算國保的</span>，分開核算後合併發放。
+                        </p>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 p-5 rounded-2xl space-y-2">
+                        <div class="w-8 h-8 bg-amber-600 text-white font-black rounded-lg flex items-center justify-center text-sm shadow-sm">2</div>
+                        <h3 class="font-bold text-slate-900 text-base">農保具極高排他性</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            農保年資完全無法與勞保合併。且領取過勞保、公保或國保老年給付者，原則上<span class="font-bold text-amber-800">無法再請領老農津貼</span>；每年兼職保勞保重複超過 180 天亦會喪失農保資格。
+                        </p>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 p-5 rounded-2xl space-y-2">
+                        <div class="w-8 h-8 bg-emerald-600 text-white font-black rounded-lg flex items-center justify-center text-sm shadow-sm">3</div>
+                        <h3 class="font-bold text-slate-900 text-base">大水庫 vs 個人專戶</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            勞保、國保、公保是「社會保險（大水庫，有破產/改革隱憂）」；而<span class="font-bold text-emerald-800">勞退（新制）是個人專戶</span>，隨身分證帶著走、絕對不破產，兩者層次完全不同！
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Grand Summary Matrix Table -->
+                <div class="overflow-x-auto rounded-xl border border-slate-200 mt-6">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead class="bg-slate-900 text-white font-bold">
+                            <tr>
+                                <th class="p-3.5">保險/制度</th>
+                                <th class="p-3.5">制度性質</th>
+                                <th class="p-3.5">年資與勞保能否併計門檻？</th>
+                                <th class="p-3.5">給付計算與請領方式</th>
+                                <th class="p-3.5">重要排他與警語</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 bg-white">
+                            <tr>
+                                <td class="p-3.5 font-bold text-sky-700">🇹🇼 國保 (國民年金)</td>
+                                <td class="p-3.5 text-slate-600">社會保險 (未就業人口)</td>
+                                <td class="p-3.5 text-emerald-600 font-bold">✅ 可以併計 (滿15年可在65歲領勞保年金)</td>
+                                <td class="p-3.5 text-slate-600">分別計算各自金額後合併發放。</td>
+                                <td class="p-3.5 text-slate-500">有勞保期間不保國保。</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3.5 font-bold text-emerald-700">🌾 農保 (農民健康保險)</td>
+                                <td class="p-3.5 text-slate-600">職域社會保險 (農民)</td>
+                                <td class="p-3.5 text-rose-600 font-bold">❌ 絕對不能合併</td>
+                                <td class="p-3.5 text-slate-600">無老年給付，65歲符資格領老農津貼。</td>
+                                <td class="p-3.5 text-rose-600 font-bold">領其他老年給付者排除老農津貼；雙投保超180天退農保。</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3.5 font-bold text-purple-700">🏛️ 公保 (公教人員保險)</td>
+                                <td class="p-3.5 text-slate-600">職域社會保險 (公教)</td>
+                                <td class="p-3.5 text-slate-600 font-bold">❌ 不能直接合併計算給付</td>
+                                <td class="p-3.5 text-slate-600">各自採計年資，符合資格分別請領退撫與勞保。</td>
+                                <td class="p-3.5 text-slate-500">雙軌獨立，請領條件依各自法規。</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3.5 font-bold text-amber-700">💰 勞退新制 (職業退休金)</td>
+                                <td class="p-3.5 text-slate-600">個人專戶 (個人資產)</td>
+                                <td class="p-3.5 text-slate-600">不適用 (為獨立個人帳戶)</td>
+                                <td class="p-3.5 text-slate-600">雇主提繳6%+自提，60歲即可領。滿15年可月領或一次領。</td>
+                                <td class="p-3.5 text-emerald-600 font-bold">無破產風險，跟著身分證一輩子。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 text-center">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-400">
+            <div>
+                2026 勞保新制大解密 & AI理財 · 跨制度年資教學互動神器
+            </div>
+            <div class="flex items-center gap-4">
+                <span>主講人：沈明福 經理 (阿福教練)</span>
+                <a href="https://lin.ee/YGTARlx" target="_blank" rel="noopener" class="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 transition underline">
+                    <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                    <span>LINE 官方帳號 (一對一諮詢)</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 各制度特性與 2026 最新標準說明 Modal 彈窗 -->
+    <div x-show="showInfoModal" 
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4" 
+         style="display: none;">
+        
+        <div @click.away="showInfoModal = false" class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-slate-200">
+            <!-- Modal Header -->
+            <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center space-x-2">
+                    <div class="p-1.5 bg-sky-500 rounded-lg text-white">
+                        <i data-lucide="book-marked" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base text-white">2026 各大社會保險與退休金制度特性對照指南</h3>
+                        <p class="text-xs text-slate-400">投保級距天花板 · 計費方式 · 給付邏輯與重要限制</p>
+                    </div>
+                </div>
+                <button @click="showInfoModal = false" class="text-slate-400 hover:text-white p-1 rounded-lg transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content (Scrollable) -->
+            <div class="p-6 overflow-y-auto space-y-6 text-slate-700 text-xs sm:text-sm leading-relaxed">
+                
+                <!-- 5 大制度卡片網格 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <!-- 1. 勞保 -->
+                    <div class="p-4 rounded-xl border border-sky-200 bg-sky-50/50 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sky-900 text-sm flex items-center gap-1.5">
+                                💼 勞工保險 (勞保)
+                            </span>
+                            <span class="text-[11px] font-extrabold bg-sky-600 text-white px-2 py-0.5 rounded">社會保險</span>
+                        </div>
+                        <div class="text-xs space-y-1.5 text-slate-600">
+                            <div><strong>• 2026 投保薪資：</strong>共 11 級距，下限 29,500 元，上限 <strong class="text-sky-700">45,800 元 (天花板)</strong>。</div>
+                            <div><strong>• 保費負擔：</strong>勞工自負 20%、雇主 70%、政府 10% (費率約 12.5%)。</div>
+                            <div><strong>• 退休年金：</strong>採「加保期間最高 60 個月平均投保薪資」× 年資 × 1.55%。</div>
+                            <div><strong>• 特性警語：</strong>有破產/改革打折風險（大水庫體系）；滿 15 年滿 65 歲可月領。</div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 國保 -->
+                    <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-emerald-900 text-sm flex items-center gap-1.5">
+                                🇹🇼 國民年金 (國保)
+                            </span>
+                            <span class="text-[11px] font-extrabold bg-emerald-600 text-white px-2 py-0.5 rounded">社會保險</span>
+                        </div>
+                        <div class="text-xs space-y-1.5 text-slate-600">
+                            <div><strong>• 2026 投保金額：</strong>法定單一固定金額 <strong class="text-emerald-700">20,952 元</strong> (無法自選級距)。</div>
+                            <div><strong>• 保費負擔：</strong>被保險人 60% (1,257元/月)、政府補助 40% (838元/月)。</div>
+                            <div><strong>• 適用對象：</strong>25~65 歲未參加勞保、農保、公教保之國民（待業/家庭主婦）。</div>
+                            <div><strong>• 併計亮點：</strong>勞保年資未滿 15 年者，可與國保年資合併達 15 年，解鎖 65 歲月領勞保年金！</div>
+                        </div>
+                    </div>
+
+                    <!-- 3. 勞退新制 -->
+                    <div class="p-4 rounded-xl border border-amber-200 bg-amber-50/50 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-amber-900 text-sm flex items-center gap-1.5">
+                                💰 勞退新制 (勞工退休金)
+                            </span>
+                            <span class="text-[11px] font-extrabold bg-amber-600 text-white px-2 py-0.5 rounded">個人獨立專戶</span>
+                        </div>
+                        <div class="text-xs space-y-1.5 text-slate-600">
+                            <div><strong>• 2026 提繳工資：</strong>共 10 組 60 級距，最高上限達 <strong class="text-amber-800">150,000 元 (第60級)</strong>。</div>
+                            <div><strong>• 提繳規定：</strong>雇主每月依法強制提繳至少 6% (最高9,000元)，勞工可自願提繳 0~6% 全額免稅。</div>
+                            <div><strong>• 領取條件：</strong>年滿 60 歲即可請領！年資滿 15 年可選月領或一次領。</div>
+                            <div><strong>• 核心優勢：</strong><strong class="text-emerald-700">跟著身分證走、絕對不破產</strong>，完全是個人專屬資產！</div>
+                        </div>
+                    </div>
+
+                    <!-- 4. 公保 -->
+                    <div class="p-4 rounded-xl border border-purple-200 bg-purple-50/50 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-purple-900 text-sm flex items-center gap-1.5">
+                                🏛️ 公教人員保險 (公保)
+                            </span>
+                            <span class="text-[11px] font-extrabold bg-purple-600 text-white px-2 py-0.5 rounded">職域保險</span>
+                        </div>
+                        <div class="text-xs space-y-1.5 text-slate-600">
+                            <div><strong>• 採計標準：</strong>以公教人員之「<strong class="text-purple-700">本俸/本薪</strong>」計算（約全薪 60%~70%），約 21,800~61,000 元。</div>
+                            <div><strong>• 退撫雙軌：</strong>包含「公保一次養老/年金給付」與「退撫新制專戶/年金」。</div>
+                            <div><strong>• 轉職保留：</strong>轉任公職後原勞保年資自動「冷凍保留」，屆齡時雙邊皆可領取。</div>
+                        </div>
+                    </div>
+
+                    <!-- 5. 農保 -->
+                    <div class="p-4 rounded-xl border border-rose-200 bg-rose-50/50 space-y-2 md:col-span-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-rose-900 text-sm flex items-center gap-1.5">
+                                🌾 農民健康保險 (農保) & 老農津貼
+                            </span>
+                            <span class="text-[11px] font-extrabold bg-rose-600 text-white px-2 py-0.5 rounded">農民職域保險</span>
+                        </div>
+                        <div class="text-xs space-y-1.5 text-slate-600">
+                            <div><strong>• 投保金額：</strong>法定月投保金額為 <strong class="text-rose-700">20,400 元</strong>。老農津貼每月 <strong>8,110 元</strong>。</div>
+                            <div><strong>• 嚴格排他條款：</strong>已領取勞保、公保或國保老年給付者，原則上<strong>不得再領取老農津貼</strong>！</div>
+                            <div><strong>• 年資不相通：</strong>農保年資完全無法與勞保合併；農民每年兼職保勞保若重複超過 180 天將被退保農保。</div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end">
+                <button @click="showInfoModal = false" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition">
+                    關閉說明
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function appData() {
+            return {
+                activeTab: 'matrix',
+                showInfoModal: false,
+                sysA: 'labor',
+                sysB: 'national',
+
+                // Systems definitions
+                systems: [
+                    { id: 'labor', name: '勞保', icon: '💼' },
+                    { id: 'national', name: '國保', icon: '🇹🇼' },
+                    { id: 'farmer', name: '農保', icon: '🌾' },
+                    { id: 'civil', name: '公保', icon: '🏛️' },
+                    { id: 'pension', name: '勞退新制', icon: '💰' }
+                ],
+
+                // Simulator Data
+                newRecord: {
+                    system: 'labor',
+                    years: 10,
+                    salary: 45800
+                },
+                careerList: [
+                    { system: 'labor', years: 9, salary: 45800 },
+                    { system: 'national', years: 11, salary: 20952 }
+                ],
+
+                onSystemChange() {
+                    const sys = this.newRecord.system;
+                    if (sys === 'labor') {
+                        this.newRecord.salary = 45800;
+                    } else if (sys === 'national') {
+                        this.newRecord.salary = 20952;
+                    } else if (sys === 'farmer') {
+                        this.newRecord.salary = 20400;
+                    } else if (sys === 'civil') {
+                        this.newRecord.salary = 42000;
+                    } else if (sys === 'pension') {
+                        this.newRecord.salary = 45800;
+                    }
+                },
+
+                getSalaryLabel() {
+                    const map = {
+                        labor: '勞保月投保薪資級距 (2026最新)',
+                        national: '國保月投保金額 (法定固定)',
+                        farmer: '農保月投保金額 (法定固定)',
+                        civil: '公保保險俸(薪)額 (本俸制)',
+                        pension: '勞退月提繳工資級距 (上限15萬)'
+                    };
+                    return map[this.newRecord.system] || '投保薪資 (元)';
+                },
+
+                getSalaryBadge() {
+                    const map = {
+                        labor: '上限 45,800 元',
+                        national: '固定 20,952 元',
+                        farmer: '固定 20,400 元',
+                        civil: '本俸計算 (約實薪6~7成)',
+                        pension: '最高 150,000 元'
+                    };
+                    return map[this.newRecord.system] || '';
+                },
+
+                getSystemTip() {
+                    const map = {
+                        labor: '💡 <strong>勞保說明：</strong>2026年最新11級距，最低29,500元，天花板為45,800元。退休金按加保期間「最高60個月」平均投保薪資計算。',
+                        national: '💡 <strong>國保說明：</strong>國民年金依法為單一固定金額 20,952 元，待業空窗期納保，65歲可請領國保老年年金。',
+                        farmer: '💡 <strong>農保說明：</strong>法定固定月投保金額 20,400 元。滿 15 年年滿 65 歲可月領老農津貼 8,110 元（領其他社會保險老年給付者具排他性）。',
+                        civil: '💡 <strong>公保說明：</strong>公教人員採計「本俸/年功俸」，非實領總薪資。退休時公保與退撫專戶雙軌並行。',
+                        pension: '💡 <strong>勞退說明：</strong>勞退新制為個人獨立專戶，提繳上限高達 15 萬元。年滿 60 歲即可申請領回，絕不破產！'
+                    };
+                    return map[this.newRecord.system] || '';
+                },
+
+                // Quiz Data
+                quizCorrectCount: 0,
+                quizList: [
+                    {
+                        id: 1,
+                        title: '小明有勞保 9 年、國保 11 年，年滿 65 歲時能否領「勞保老年年金」？',
+                        scenario: '小明今年 65 歲，過去工作參加勞保 9 年，後來待業轉投國保 11 年，合計年資 20 年。請問他可以領勞保老年年金嗎？如何給付？',
+                        options: [
+                            { text: 'A. 不行，因為勞保年資未滿 15 年，只能一次領。' },
+                            { text: 'B. 可以，年資併計達 20 年，勞保與國保合併算成一筆大年金。' },
+                            { text: 'C. 可以！勞保+國保併計達 15 年即可月領，但勞保算 9 年、國保算 11 年，各自算金額後合併發放。' },
+                            { text: 'D. 不行，必須補繳勞保保費湊滿 15 年才能領。' }
+                        ],
+                        correctIdx: 2,
+                        userAnswer: null,
+                        explanation: '<b>正確答案為 C！</b><br>依據《勞工保險條例》與《國民年金法》，勞保年資未滿 15 年者，若<b>「勞保年資 + 國保年資 ≧ 15 年」</b>，年滿 65 歲時即具備請領「勞保老年年金」資格。<br>但給付金額採<b>「分別計算、合併發放」</b>：勞保局會用 9 年計算勞保年金，用 11 年計算國保年金，按月合併匯入帳戶！'
+                    },
+                    {
+                        id: 2,
+                        title: '老王參加農保 15 年，後來到公司打工參加勞保 5 年，農保年資能否算入勞保？',
+                        scenario: '老王原本是農民務農保農保 15 年，後來轉去工廠上班加保勞保 5 年。老王退休時可以把農保 15 年算進勞保年資嗎？',
+                        options: [
+                            { text: 'A. 可以，農保與勞保都是社會保險，可以 1:1 合併年資。' },
+                            { text: 'B. 完全不行！農保與勞保制度不同，年資不能合併；且已領勞保老年給付後，原則上排他無法再領老農津貼。' },
+                            { text: 'C. 可以，但農保年資折半計算。' },
+                            { text: 'D. 只要向農會申請就可以轉換成勞保年資。' }
+                        ],
+                        correctIdx: 1,
+                        userAnswer: null,
+                        explanation: '<b>正確答案為 B！</b><br>勞保與農保屬於不同體系，<b>年資完全不能合併</b>。且農保老農津貼與其他社會保險老年給付具有<b>排他性</b>，一旦領取了勞保老年給付，就無法再領取老農津貼。此外，每年若兼職加保勞保超過 180 天，農保資格還可能被取消！'
+                    },
+                    {
+                        id: 3,
+                        title: '陳小姐先在私企保勞保 12 年，後來考上公務員保公保 18 年，年資如何處理？',
+                        scenario: '陳小姐 35 歲前在民間企業上班累積 12 年勞保，之後考取公職投保公保 18 年至退休。',
+                        options: [
+                            { text: 'A. 公保會直接把 12 年勞保吸收併入公保退休金。' },
+                            { text: 'B. 兩者獨立！公保依 18 年計算公教退撫給付；勞保 12 年則於符合勞保請領條件時獨立請領勞保老年給付。' },
+                            { text: 'C. 勞保年資自動作廢歸零。' },
+                            { text: 'D. 必須選擇放棄其中一種制度。' }
+                        ],
+                        correctIdx: 1,
+                        userAnswer: null,
+                        explanation: '<b>正確答案為 B！</b><br>公保與勞保屬於完全獨立的不同職業社會保險制度。年資無法直接相互相加計算給付金額。陳小姐退休時，公保部分依公保法規領取公教退休給付；原有的 12 年勞保年資會被保留，未來達到法定請領條件時可再獨立請領勞保給付（兩筆都可以領，雙軌並行）。'
+                    },
+                    {
+                        id: 4,
+                        title: '張先生勞保 20 年後 49 歲離職，自動轉國保，54 歲不幸病逝，家屬能否領勞保？',
+                        scenario: '張先生 49 歲離職退勞保（投保薪資 45,800 元），自動轉為國保被保險人。54 歲時不幸罹癌身故，家屬向勞保局申請勞保死亡給付卻被拒絕，為什麼？',
+                        options: [
+                            { text: 'A. 因為勞保退保超過 5 年，已不在保險效力期間，只能領國保喪葬/遺屬給付；同一保險事故不可重複請領。' },
+                            { text: 'B. 勞保局作業疏失，家屬一定領得到 100 萬勞保死亡給付。' },
+                            { text: 'C. 國保跟勞保可以同時請領兩筆遺屬年金。' },
+                            { text: 'D. 只要有繳過勞保，不論退保多久過世都可全額請領死亡給付。' }
+                        ],
+                        correctIdx: 0,
+                        userAnswer: null,
+                        explanation: '<b>正確答案為 A！</b><br>這是課堂極重要的經典真實案例！勞保是「在職保險」，張先生在 49 歲離職退保後已不在勞保保險效力內，54 歲身故時身分為國保被保險人。因此家屬僅能請領國民年金的給付，無法再請領勞保死亡給付。提醒：若退保前已符合失能或可追溯條款，應及早請領失能給付！'
+                    },
+                    {
+                        id: 5,
+                        title: '「勞保老年給付」與「勞工退休金（勞退新制）」有何根本差異？',
+                        scenario: '許多學員常搞混「勞保」與「勞退」，以為這兩個是同一個東西。',
+                        options: [
+                            { text: 'A. 兩個完全一樣，只是名稱不同。' },
+                            { text: 'B. 勞保是社會保險（大水庫）；勞退是雇主6%+個人自提的「個人獨立專戶」，跟著身分證走且絕不破產。' },
+                            { text: 'C. 勞退會因為少子化而破產打折。' },
+                            { text: 'D. 領了勞保就不能領勞退。' }
+                        ],
+                        correctIdx: 1,
+                        userAnswer: null,
+                        explanation: '<b>正確答案為 B！</b><br><b>勞保</b>是政府辦理的「社會保險」，由雇主、勞工與政府共同繳費入大水庫；<b>勞退（新制）</b>則是雇主依法每月提撥至少 6% 至勞工「個人專戶」的職業退休金，屬於勞工個人資產，絕無破產問題，退休時<b>兩筆金額都可以同時請領</b>！'
+                    }
+                ],
+
+                initApp() {
+                    this.$nextTick(() => {
+                        lucide.createIcons();
+                    });
+                },
+
+                getSystemName(id) {
+                    const sys = this.systems.find(s => s.id === id);
+                    return sys ? sys.name : '';
+                },
+
+                getSystemIcon(id) {
+                    const sys = this.systems.find(s => s.id === id);
+                    return sys ? sys.icon : '';
+                },
+
+                // Detailed comparison logic
+                getComparisonResult() {
+                    const a = this.sysA;
+                    const b = this.sysB;
+
+                    if (a === b) {
+                        return {
+                            canCombine: true,
+                            combineBadge: '同制度年資計算',
+                            qualifyText: '同制度年資直接累計',
+                            qualifyDesc: '同一保險制度下的年資可直接相加累計計算。',
+                            calcText: '依該制度公式發放',
+                            calcDesc: '依照該制度標準計算投保金額與給付月數。',
+                            conflictText: '無衝突',
+                            conflictDesc: '同制度無排他問題。',
+                            teacherNotes: '同制度內年資正常累計即可，請學員注意投保薪資與請領年齡門檻。'
+                        };
+                    }
+
+                    // Labor + National Pension
+                    if ((a === 'labor' && b === 'national') || (a === 'national' && b === 'labor')) {
+                        return {
+                            canCombine: true,
+                            combineBadge: '資格可併計 / 給付分別算',
+                            qualifyText: '✅ 可併計資格門檻 (15年)',
+                            qualifyDesc: '若勞保年資未滿 15 年，但「勞保 + 國保年資 ≧ 15 年」，年滿 65 歲即可取得「勞保老年年金」請領資格。',
+                            calcText: '⚖️ 分開計算，合併發放',
+                            calcDesc: '勞保依勞保年資計算金額，國保依國保年資計算金額，最後主管機關會將兩筆金額合併按月發給。',
+                            conflictText: '⚠️ 在職保勞保，無職保國保',
+                            conflictDesc: '有受僱投保勞保期間，不會同時投保國保。待業空窗期才會收到國保繳款單。',
+                            teacherNotes: '<b>教學關鍵：</b>提醒學員「併計」只用於判斷請領資格，不是把兩種年資加總成單一筆年資來算錢！勞保與國保保費不同、所得替代率不同，金額必須分開算。'
+                        };
+                    }
+
+                    // Labor + Farmer Pension
+                    if ((a === 'labor' && b === 'farmer') || (a === 'farmer' && b === 'labor')) {
+                        return {
+                            canCombine: false,
+                            combineBadge: '年資不可合併 / 具排他性',
+                            qualifyText: '❌ 完全不能合併年資',
+                            qualifyDesc: '農保年資不能併入勞保年資，無法補足勞保老年年金所需的 15 年門檻。',
+                            calcText: '🚫 雙方給付分別認定',
+                            calcDesc: '勞保依勞保年資請領老年給付；農保無老年給付（僅老農津貼）。',
+                            conflictText: '⛔ 具高排他性與限制',
+                            conflictDesc: '已領取勞保老年給付者，原則上不得請領老農津貼；且每年重複加保勞保超過 180 天會取消農保資格。',
+                            teacherNotes: '<b>教學關鍵：</b>許多農民轉打工會誤以為農保可以算進勞保，這點務必嚴格澄清！另外已領勞保老年給付會排擠老農津貼，請學員勿輕易退保或變更身分。'
+                        };
+                    }
+
+                    // Labor + Civil
+                    if ((a === 'labor' && b === 'civil') || (a === 'civil' && b === 'labor')) {
+                        return {
+                            canCombine: false,
+                            combineBadge: '雙軌獨立 / 年資不併算給付',
+                            qualifyText: '⚖️ 雙軌獨立判斷',
+                            qualifyDesc: '公保與勞保為不同社會保險體系，年資無法直接相互相加來計算給付金額。',
+                            calcText: '💼 各自採計，分開請領',
+                            calcDesc: '公保年資計算公教退撫給付，勞保年資則保留至符合勞保條件時請領勞保老年給付。',
+                            conflictText: '✅ 雙筆權益均受保障',
+                            conflictDesc: '轉任公職不代表勞保年資消失，未來年齡達標可同時請領勞保與公保給付。',
+                            teacherNotes: '<b>教學關鍵：</b>轉任公務員後，原有的勞保年資會「冷凍保留」，不會歸零也不會消失！等到法定退休年齡到了，陳情請領即可，兩邊錢都可以領到。'
+                        };
+                    }
+
+                    // Labor + Pension (Labor Pension)
+                    if ((a === 'labor' && b === 'pension') || (a === 'pension' && b === 'labor')) {
+                        return {
+                            canCombine: true,
+                            combineBadge: '完全獨立 / 雙重保障',
+                            qualifyText: '🎯 兩筆各自獨立採計',
+                            qualifyDesc: '勞保是社會保險（大水庫）；勞退是個人專戶。兩者完全不同，同時存在。',
+                            calcText: '💰 勞保月領/一次領 + 勞退專戶',
+                            calcDesc: '勞保滿 15 年、滿 65 歲可月領年金；勞退滿 60 歲即可申請領回專戶累積本金與收益。',
+                            conflictText: '✅ 完全無衝突',
+                            conflictDesc: '勞退新制為個人資產，跟著身分證走，不論換多少工作或離職均不受影響，絕不破產。',
+                            teacherNotes: '<b>教學關鍵：</b>一定要幫學員打破「勞保會破產所以退休金全沒了」的迷思！勞退專戶是個人資產，就算勞保改革打折，勞退專戶裡的每一分錢都完完整整屬於勞工自己。'
+                        };
+                    }
+
+                    // Default fallback for other combinations
+                    return {
+                        canCombine: false,
+                        combineBadge: '制度不同 / 個別核算',
+                        qualifyText: '❌ 年資原則上不直接合併計算',
+                        qualifyDesc: '兩者分屬不同社會保險或退休金體系，資格與給付分開審查。',
+                        calcText: '依各自法規請領',
+                        calcDesc: '請領時分別檢視是否符合該制度之年齡與年資門檻。',
+                        conflictText: '注意社會福利不重複給與原則',
+                        conflictDesc: '部分給付可能受排他條款或重複投保限制影響。',
+                        teacherNotes: '建議向勞保局或相關承辦單位提出個案書面查詢，確認是否符合排他性規定。'
+                    };
+                },
+
+                // Simulator Methods
+                addCareerRecord() {
+                    this.careerList.push({
+                        system: this.newRecord.system,
+                        years: Number(this.newRecord.years),
+                        salary: Number(this.newRecord.salary)
+                    });
+                },
+
+                removeCareerRecord(idx) {
+                    this.careerList.splice(idx, 1);
+                },
+
+                resetCareer() {
+                    this.careerList = [];
+                },
+
+                getTotalCareerYears() {
+                    return this.careerList.reduce((sum, item) => sum + item.years, 0);
+                },
+
+                getLaborYears() {
+                    return this.careerList.filter(i => i.system === 'labor').reduce((s, i) => s + i.years, 0);
+                },
+
+                getNationalYears() {
+                    return this.careerList.filter(i => i.system === 'national').reduce((s, i) => s + i.years, 0);
+                },
+
+                getFarmerYears() {
+                    return this.careerList.filter(i => i.system === 'farmer').reduce((s, i) => s + i.years, 0);
+                },
+
+                getLaborVerdict() {
+                    const laborY = this.getLaborYears();
+                    const nationalY = this.getNationalYears();
+                    const totalCombined = laborY + nationalY;
+
+                    if (laborY >= 15) {
+                        const laborItem = this.careerList.find(i => i.system === 'labor');
+                        const salary = laborItem ? laborItem.salary : 45800;
+                        const estMonthly = Math.round(salary * laborY * 0.0155);
+                        return {
+                            qualified: true,
+                            badge: '單獨達標 (勞保≥15年)',
+                            description: `您單獨擁有勞保 ${laborY} 年年資，年滿 65 歲可直接請領「勞保老年年金」（按月領取）。`,
+                            estimatedMonthly: estMonthly
+                        };
+                    } else if (totalCombined >= 15 && laborY > 0) {
+                        const laborItem = this.careerList.find(i => i.system === 'labor');
+                        const salary = laborItem ? laborItem.salary : 45800;
+                        const estMonthly = Math.round(salary * laborY * 0.0155);
+                        return {
+                            qualified: true,
+                            badge: '併計達標 (勞保+國保≥15年)',
+                            description: `您的勞保僅 ${laborY} 年，但加上國保 ${nationalY} 年後合計 ${totalCombined} 年（滿15年）。年滿 65 歲時，具備請領「勞保老年年金」資格！但勞保金額僅按 ${laborY} 年計算發放。`,
+                            estimatedMonthly: estMonthly
+                        };
+                    } else if (laborY > 0) {
+                        return {
+                            qualified: false,
+                            badge: '僅能一次請領',
+                            description: `您的勞保年資 ${laborY} 年，且加上國保後仍未達 15 年門檻，退休時勞保部分僅能辦理「一次請領老年給付」。`,
+                            estimatedMonthly: 0
+                        };
+                    } else {
+                        return {
+                            qualified: false,
+                            badge: '無勞保年資',
+                            description: '履歷中無勞保投保紀錄。',
+                            estimatedMonthly: 0
+                        };
+                    }
+                },
+
+                getNationalVerdict() {
+                    const natY = this.getNationalYears();
+                    if (natY > 0) {
+                        const estNat = Math.round(natY * 20952 * 0.013) + 4049; // 2026 國保 B 式精算 (20,952 * 年資 * 1.3% + 4,049)
+                        return {
+                            qualified: true,
+                            badge: `擁有國保 ${natY} 年`,
+                            description: `年滿 65 歲時，可請領國民年金老年年金。若有與勞保併計請領勞保年金者，國保金額依國保 ${natY} 年年資獨立計算後合併發放。`
+                        };
+                    }
+                    return {
+                        qualified: false,
+                        badge: '無國保年資',
+                        description: '履歷中無國保投保紀錄。'
+                    };
+                },
+
+                getFarmerVerdict() {
+                    const farmY = this.getFarmerYears();
+                    const laborY = this.getLaborYears();
+                    if (farmY > 0) {
+                        if (laborY > 0) {
+                            return {
+                                conflict: true,
+                                badge: '注意！農勞保衝突排他',
+                                description: `履歷中包含農保 ${farmY} 年與勞保 ${laborY} 年。提醒：農保年資不可併入勞保；且若未來請領了勞保老年給付，原則上將無法請領老農津貼！`
+                            };
+                        }
+                        return {
+                            conflict: false,
+                            badge: `農保 ${farmY} 年`,
+                            description: `農保滿 15 年且年滿 65 歲符合農業資格者，可請領全額老農津貼。`
+                        };
+                    }
+                    return {
+                        conflict: false,
+                        badge: '無農保年資',
+                        description: '履歷中無農保紀錄。'
+                    };
+                },
+
+                getOverallTakeaway() {
+                    const laborY = this.getLaborYears();
+                    const natY = this.getNationalYears();
+                    if (laborY < 15 && (laborY + natY) >= 15) {
+                        return '「關鍵亮點案例！」這正是勞保併計國保的最佳範例。學員原本勞保不滿15年不能月領，透過國保年資補足15年門檻，成功解鎖勞保月領年金資格！';
+                    }
+                    if (this.getFarmerYears() > 0 && laborY > 0) {
+                        return '「警示案例！」此學員同時有農保與勞保，需特別提醒老農津貼的排他性，避免因誤以為年資可相加而影響老後津貼權益。';
+                    }
+                    return '透過此試算可清楚發現：各社會保險年資各自獨立採計，請領時依各自規定核算金額，達到資產最大化！';
+                },
+
+                // Quiz Logic
+                answerQuiz(qId, optIdx) {
+                    const q = this.quizList.find(item => item.id === qId);
+                    if (q && q.userAnswer === null) {
+                        q.userAnswer = optIdx;
+                        if (optIdx === q.correctIdx) {
+                            this.quizCorrectCount++;
+                        }
+                    }
+                },
+
+                getOptionStyle(q, optIdx) {
+                    if (q.userAnswer === null) {
+                        return 'bg-white hover:bg-sky-50 border-slate-200 text-slate-800 hover:border-sky-300';
+                    }
+                    if (optIdx === q.correctIdx) {
+                        return 'bg-emerald-100 border-emerald-400 text-emerald-900 font-bold';
+                    }
+                    if (q.userAnswer === optIdx && optIdx !== q.correctIdx) {
+                        return 'bg-rose-100 border-rose-400 text-rose-900 font-bold';
+                    }
+                    return 'bg-slate-100 border-slate-200 text-slate-400 opacity-60';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
