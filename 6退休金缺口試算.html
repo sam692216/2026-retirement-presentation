@@ -357,40 +357,38 @@
       <div class="advice-text">{{ adviceText }}</div>
     </div>
 
-    <div class="cta">
-      <a class="cta-survey" href="https://reurl.cc/NO4Qge" target="_blank" rel="noopener">📝 立即填寫：退休金問卷（專屬客製諮詢）</a>
-      <a class="cta-line" :href="lineUrl" target="_blank" rel="noopener">加 LINE 找阿福教練，免費規劃缺口補足方案</a>
-      <button class="cta-copy" @click="copySummary">📋 複製試算結果，傳給我看看</button>
+    <!-- 行動呼籲專區 (問卷 + 阿福教練名片 + 複製) -->
+    <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
+      <a class="cta-survey" href="https://reurl.cc/NO4Qge" target="_blank" rel="noopener">
+        📝 立即填寫：退休金問卷（專屬客製諮詢）
+      </a>
+      
+      <!-- 阿福教練個人品牌精緻卡片 (與版面完全協調) -->
+      <div style="background:linear-gradient(135deg, #0F172A 0%, #1E293B 100%); border:1px solid rgba(56, 189, 248, 0.25); border-radius:16px; padding:15px; color:#fff; box-shadow: 0 4px 16px rgba(0,0,0,0.15);">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="position:relative; flex-shrink:0;">
+            <img src="阿福教練IP.jpg" alt="沈明福 經理 (阿福教練)" style="width:58px; height:58px; border-radius:12px; object-fit:cover; border:2px solid #F59E0B;">
+            <img src="阿福教練個人IP.jpg" alt="阿福教練 IP" style="width:20px; height:20px; border-radius:50%; border:1.5px solid #fff; position:absolute; bottom:-3px; right:-3px; background:#fff;">
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              <span style="font-weight:800; font-size:14px; color:#fff;">沈明福 經理 (阿福教練)</span>
+              <span style="font-size:10px; font-weight:800; background:rgba(245, 158, 11, 0.2); color:#FCD34D; border:1px solid rgba(245, 158, 11, 0.3); padding:1px 6px; border-radius:999px;">大勝管顧 執行長</span>
+            </div>
+            <div style="font-size:11px; color:#7DD3FC; margin-top:2px; font-weight:500;">IARFC 認證財務顧問師 · 高科大業師</div>
+            <div style="font-size:11px; color:#CBD5E1; margin-top:3px; line-height:1.4;">算出現金缺口不用慌！歡迎加 LINE 免費預約缺口補足方案。</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <a href="https://lin.ee/YGTARlx" target="_blank" rel="noopener" style="display:flex; align-items:center; justify-content:center; gap:6px; background:#06C755; color:#fff; padding:11px; border-radius:10px; font-weight:800; font-size:13.5px; text-decoration:none; box-shadow: 0 4px 10px rgba(6, 199, 85, 0.25);">
+            <span>💬 加 LINE 找阿福教練 · 免費規劃缺口補足方案</span>
+          </a>
+        </div>
+      </div>
+
+      <button class="cta-copy" @click="copySummary" style="width:100%; padding:11px; font-size:13px;">📋 複製試算結果，傳給我看看</button>
     </div>
   </div>
-
-  
-        <!-- 阿福教練個人品牌與一對一諮詢卡片 (Coach Fu CTA Card) -->
-        <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-sky-950 rounded-2xl p-5 text-white shadow-lg border border-sky-500/30 my-6">
-            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                <div class="relative shrink-0">
-                    <img src="阿福教練IP.jpg" alt="沈明福 經理 (阿福教練)" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-amber-400 shadow-md">
-                    <img src="阿福教練個人IP.jpg" alt="阿福教練 IP" class="w-7 h-7 rounded-full border-2 border-white absolute -bottom-1.5 -right-1.5 shadow bg-white">
-                </div>
-                <div class="space-y-1.5 text-center sm:text-left flex-1">
-                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                        <h4 class="text-base font-bold text-white">沈明福 經理 (阿福教練)</h4>
-                        <span class="text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full">大勝管顧 執行長</span>
-                    </div>
-                    <p class="text-xs text-sky-200 font-medium">IARFC 國際認證財務顧問師 · 國立高雄科技大學 金融資訊系業師</p>
-                    <p class="text-xs text-slate-300 leading-relaxed pt-1">
-                        算出現金缺口不用慌！透過 ETF 第三支柱與自動化長期投資即可穩健補足。立即填寫問卷或加 LINE 預約規劃！
-                    </p>
-                </div>
-            </div>
-            
-            <div class="pt-3">
-                <a href="https://lin.ee/YGTARlx" target="_blank" rel="noopener" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-black py-3 px-4 rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0">
-                    <i class="fa-solid fa-comment-dots text-lg"></i>
-                    <span>加 LINE 找阿福教練 · 免費規劃缺口補足方案</span>
-                </a>
-            </div>
-        </div>
     
   <div class="foot-note">
     本試算採簡化公式估算，僅供教育與規劃參考，實際給付金額以勞動部勞工保險局、勞退局公告為準。<br>
@@ -429,7 +427,7 @@ createApp({
       result: null,
       toastShow: false,
       toastMsg: '',
-      lineUrl: 'https://lin.ee/請替換成你的LINE官方帳號連結'
+      lineUrl: 'https://lin.ee/YGTARlx'
     }
   },
   computed: {
