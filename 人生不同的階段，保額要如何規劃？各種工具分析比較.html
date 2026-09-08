@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>投資型保單優勢與歷代生命表成本分析系統</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .tab-active {
+      border-bottom: 3px solid #2563eb;
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <header class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-xl sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div class="flex items-center space-x-3">
+          <div class="p-2.5 bg-blue-600/30 rounded-xl border border-blue-400/40 backdrop-blur-sm">
+            <i class="fa-solid fa-chart-line text-blue-300 text-2xl"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs bg-amber-400/20 text-amber-300 border border-amber-400/40 px-2 py-0.5 rounded-full font-medium">壽險規劃利器</span>
+              <span class="text-xs bg-emerald-400/20 text-emerald-300 border border-emerald-400/40 px-2 py-0.5 rounded-full font-medium">生命表降幅商機</span>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-black tracking-wide">投資型保單核心優勢與生命表成本分析系統</h1>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+          <span class="bg-slate-800/80 border border-slate-700 px-3 py-1.5 rounded-lg text-slate-300">
+            <i class="fa-regular fa-clock text-blue-400 mr-1.5"></i>第四～第七回合生命表全面演進分析
+          </span>
+          <button onclick="window.print()" class="no-print bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-print"></i> 列印報告
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <!-- Key Indicator Cards -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow transition">
+        <div class="flex items-center justify-between text-slate-500 text-sm mb-1">
+          <span>第七回合生命表成本</span>
+          <i class="fa-solid fa-shield-heart text-blue-500 text-lg"></i>
+        </div>
+        <div class="text-2xl font-black text-slate-900 flex items-baseline gap-1.5">
+          <span>下降 21% ~ 30%</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-2">114/07/29 實施，死亡率顯著降低</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow transition">
+        <div class="flex items-center justify-between text-slate-500 text-sm mb-1">
+          <span>四表 vs 七表 COI 累計差額</span>
+          <i class="fa-solid fa-piggy-bank text-emerald-500 text-lg"></i>
+        </div>
+        <div class="text-2xl font-black text-emerald-600 flex items-baseline gap-1">
+          <span id="kpi-saving">385萬 ~ 740萬</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-2">危險保費巨大差距帶來加保/重構商機</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow transition">
+        <div class="flex items-center justify-between text-slate-500 text-sm mb-1">
+          <span>家庭責任最高保額</span>
+          <i class="fa-solid fa-house-chimney text-amber-500 text-lg"></i>
+        </div>
+        <div class="text-2xl font-black text-slate-900 flex items-baseline gap-1">
+          <span id="kpi-peak-coverage">1,000</span> <span class="text-sm font-normal text-slate-500">萬元</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-2">35歲購屋生子房貸高峰期責任完整防護</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow transition">
+        <div class="flex items-center justify-between text-slate-500 text-sm mb-1">
+          <span>投資型自由調整倍數</span>
+          <i class="fa-solid fa-sliders text-indigo-500 text-lg"></i>
+        </div>
+        <div class="text-2xl font-black text-indigo-600 flex items-baseline gap-1">
+          <span>26倍 ~ 260倍</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-2">依各年齡隨人生責任彈性調整保額</p>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="flex flex-wrap border-b border-slate-200 text-sm font-medium bg-slate-50/70">
+        <button onclick="switchTab('tab-timeline')" id="btn-tab-timeline" class="tab-btn px-6 py-4 flex items-center gap-2 tab-active transition">
+          <i class="fa-solid fa-stairs"></i> 人生階梯保額自由調整
+        </button>
+        <button onclick="switchTab('tab-tables')" id="btn-tab-tables" class="tab-btn px-6 py-4 flex items-center gap-2 text-slate-600 hover:text-blue-600 transition">
+          <i class="fa-solid fa-skull-crossbones"></i> 第四～第七回合生命表成本分析
+        </button>
+        <button onclick="switchTab('tab-comparison')" id="btn-tab-comparison" class="tab-btn px-6 py-4 flex items-center gap-2 text-slate-600 hover:text-blue-600 transition">
+          <i class="fa-solid fa-scale-balanced"></i> 三大險種千萬效益總表 (圖1)
+        </button>
+        <button onclick="switchTab('tab-strategy')" id="btn-tab-strategy" class="tab-btn px-6 py-4 flex items-center gap-2 text-slate-600 hover:text-blue-600 transition">
+          <i class="fa-solid fa-lightbulb"></i> 舊戶加保與新單規劃商機
+        </button>
+      </div>
+
+      <div class="p-6">
+        <div id="tab-timeline" class="tab-content space-y-6">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-blue-50/70 p-4 rounded-xl border border-blue-100">
+            <div>
+              <h2 class="text-lg font-bold text-blue-950 flex items-center gap-2">
+                <i class="fa-solid fa-arrows-up-down-left-right text-blue-600"></i>
+                保額自由『隨人生不同階段，彈性調整』
+              </h2>
+              <p class="text-xs text-blue-700 mt-1">
+                傳統保單買了保額固定，無法適應責任變化；投資型保單可隨年齡、結婚、購屋與退休彈性升降保額！
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <span class="bg-white text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">
+                • 22歲男性：月繳5,000元，保額倍數區間約 34~260倍（204萬～1,560萬）
+              </span>
+              <span class="bg-white text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">
+                • 35歲男性：月繳5,000元，保額倍數區間約 26~180倍（156萬～1,080萬）
+              </span>
+            </div>
+          </div>
+
+          <!-- Life stage step visual simulator -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-chart-area text-indigo-500"></i> 人生責任曲線與保額階梯圖 (萬元)
+                </h3>
+                <span class="text-xs text-slate-500">可於右側調整各階段自訂保額</span>
+              </div>
+              <div class="h-80 w-full">
+                <canvas id="lifeStageChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Stage Parameters Controls -->
+            <div class="bg-slate-50 rounded-xl border border-slate-200 p-4 space-y-3.5 custom-scrollbar max-h-96 overflow-y-auto">
+              <h3 class="font-bold text-slate-800 text-sm flex items-center justify-between">
+                <span><i class="fa-solid fa-sliders text-blue-600 mr-1.5"></i>各階段責任保額設定</span>
+                <button onclick="resetDefaultStages()" class="text-xs text-blue-600 hover:underline">回復預設</button>
+              </h3>
+
+              <div class="space-y-3 text-xs">
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <div class="flex justify-between font-medium text-slate-700 mb-1">
+                    <span><i class="fa-solid fa-briefcase text-blue-500 mr-1"></i> 22歲 入社會</span>
+                    <span id="val-stage-22" class="font-bold text-blue-700">200 萬</span>
+                  </div>
+                  <input type="range" id="input-stage-22" min="100" max="500" step="50" value="200" oninput="updateStageCoverage()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <div class="flex justify-between font-medium text-slate-700 mb-1">
+                    <span><i class="fa-solid fa-heart text-rose-500 mr-1"></i> 30歲 結婚成家</span>
+                    <span id="val-stage-30" class="font-bold text-blue-700">500 萬</span>
+                  </div>
+                  <input type="range" id="input-stage-30" min="200" max="800" step="50" value="500" oninput="updateStageCoverage()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <div class="flex justify-between font-medium text-slate-700 mb-1">
+                    <span><i class="fa-solid fa-baby text-amber-500 mr-1"></i> 33歲 孩子出生</span>
+                    <span id="val-stage-33" class="font-bold text-blue-700">700 萬</span>
+                  </div>
+                  <input type="range" id="input-stage-33" min="300" max="1000" step="50" value="700" oninput="updateStageCoverage()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <div class="flex justify-between font-medium text-slate-700 mb-1">
+                    <span><i class="fa-solid fa-house text-emerald-500 mr-1"></i> 35歲 貸款買房 (最高峰)</span>
+                    <span id="val-stage-35" class="font-bold text-blue-700">1,000 萬</span>
+                  </div>
+                  <input type="range" id="input-stage-35" min="500" max="1500" step="50" value="1000" oninput="updateStageCoverage()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <div class="flex justify-between font-medium text-slate-700 mb-1">
+                    <span><i class="fa-solid fa-graduation-cap text-purple-500 mr-1"></i> 55歲 房貸清/子女大學畢業</span>
+                    <span id="val-stage-55" class="font-bold text-blue-700">300 萬</span>
+                  </div>
+                  <input type="range" id="input-stage-55" min="100" max="600" step="50" value="300" oninput="updateStageCoverage()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <div class="flex justify-between font-medium text-slate-700 mb-1">
+                    <span><i class="fa-solid fa-couch text-teal-500 mr-1"></i> 65歲 退休 (責任已了)</span>
+                    <span id="val-stage-65" class="font-bold text-blue-700">200 萬</span>
+                  </div>
+                  <input type="range" id="input-stage-65" min="50" max="400" step="50" value="200" oninput="updateStageCoverage()" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Insight callout -->
+          <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-4 text-xs sm:text-sm text-amber-900 flex items-start gap-3">
+            <i class="fa-solid fa-circle-exclamation text-amber-600 text-lg mt-0.5"></i>
+            <div>
+              <p class="font-bold mb-1">關鍵觀念：為什麼傳統壽險做不到「階梯保障」？</p>
+              <p class="leading-relaxed">
+                若在35歲用傳統「終身壽險」買滿1,000萬責任，每年保費高達34.3萬元，累積繳費近700萬，沉重保費排擠生活與投資；
+                若用「定期壽險」買滿，雖然便宜但過期即無價值；而<strong>投資型保單（甲型）</strong>可在年輕購屋生子時拉大保額槓桿，55歲責任減輕後隨時申請調低保額，節省危險保費（COI），讓帳戶價值持續在投資市場中滾存複利！
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-tables" class="tab-content hidden space-y-6">
+          <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-md border border-slate-800">
+            <div class="max-w-3xl">
+              <span class="text-xs bg-red-500/20 text-red-300 border border-red-500/30 px-2.5 py-1 rounded-full font-semibold">
+                歷史重大變革：385萬 ~ 740萬保險成本差距
+              </span>
+              <h2 class="text-2xl font-black mt-3 mb-2 tracking-wide">
+                第四、五、六、七回合生命表實施進程與 COI 成本雪崩
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                台灣國民平均壽命持續提升，金管會歷次修正經驗生命表。每一次更換生命表，壽險死亡率大幅調降（每次降幅約 21% ~ 30%）。
+                <strong>越新的生命表，投資型保單每個月扣收的危險保費（COI）就越便宜！</strong>
+              </p>
+            </div>
+
+            <!-- Life table progression timeline visual -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+              <div class="bg-slate-800/90 border border-slate-700 p-4 rounded-xl relative overflow-hidden">
+                <div class="text-xs text-slate-400">早期標準基準</div>
+                <div class="text-lg font-black text-amber-400 mt-1">第四回合生命表</div>
+                <div class="text-xs text-slate-300 mt-2">實施日：101/07/01 (2012)</div>
+                <div class="mt-3 text-xs bg-slate-700/60 p-2 rounded text-slate-300">
+                  費率基準：100%（成本最高時期）
+                </div>
+              </div>
+
+              <div class="bg-slate-800/90 border border-slate-700 p-4 rounded-xl relative overflow-hidden">
+                <div class="text-xs text-blue-400 font-semibold">↓ 降幅約 30%</div>
+                <div class="text-lg font-black text-blue-300 mt-1">第五回合生命表</div>
+                <div class="text-xs text-slate-300 mt-2">實施日：110/07/01 (2021)</div>
+                <div class="mt-3 text-xs bg-slate-700/60 p-2 rounded text-slate-300">
+                  費率相對第四回合約降 30%
+                </div>
+              </div>
+
+              <div class="bg-slate-800/90 border border-slate-700 p-4 rounded-xl relative overflow-hidden">
+                <div class="text-xs text-indigo-400 font-semibold">↓ 再降幅約 30%</div>
+                <div class="text-lg font-black text-indigo-300 mt-1">第六回合生命表</div>
+                <div class="text-xs text-slate-300 mt-2">各險種逐步採用</div>
+                <div class="mt-3 text-xs bg-slate-700/60 p-2 rounded text-slate-300">
+                  維持低成本死亡率水準
+                </div>
+              </div>
+
+              <div class="bg-blue-900/50 border border-blue-500 p-4 rounded-xl relative overflow-hidden ring-2 ring-blue-500/40">
+                <span class="absolute top-2 right-2 text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-bold">最新波段</span>
+                <div class="text-xs text-emerald-400 font-semibold">↓ 再降 21% ~ 30%</div>
+                <div class="text-lg font-black text-emerald-300 mt-1">第七回合生命表</div>
+                <div class="text-xs text-slate-300 mt-2">實施日：114/07/29 (2025)</div>
+                <div class="mt-3 text-xs bg-blue-800/70 p-2 rounded text-emerald-200">
+                  保險成本僅約第四回合之 35%~45%
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Cumulative COI Cost Simulation based on Image 4 -->
+          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                  <i class="fa-solid fa-calculator text-blue-600"></i>
+                  依據手繪手稿階梯：各回合生命表在 22~65歲 累積保險成本 (COI) 實測
+                </h3>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  以各階段設定保額（22歲200萬、30歲500萬、33歲700萬、35歲1000萬、55歲300萬、65歲200萬）之危險保費試算
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200">
+                  性別：男性標準體
+                </span>
+              </div>
+            </div>
+
+            <!-- Cumulative Cost Chart -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+              <div class="lg:col-span-2 h-72">
+                <canvas id="coiChart"></canvas>
+              </div>
+              <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+                <div class="font-bold text-slate-700 text-sm mb-1">43年總累計危險保費對比</div>
+                
+                <div class="flex justify-between items-center p-2.5 bg-amber-50 rounded-lg border border-amber-200">
+                  <div>
+                    <span class="font-semibold text-amber-900 block">第四回合生命表</span>
+                    <span class="text-[10px] text-amber-700">101年投保舊保單</span>
+                  </div>
+                  <span id="coi-total-4" class="text-base font-black text-amber-900">NT$ 624 萬</span>
+                </div>
+
+                <div class="flex justify-between items-center p-2.5 bg-blue-50 rounded-lg border border-blue-200">
+                  <div>
+                    <span class="font-semibold text-blue-900 block">第五回合生命表</span>
+                    <span class="text-[10px] text-blue-700">110年投保舊保單</span>
+                  </div>
+                  <span id="coi-total-5" class="text-base font-black text-blue-900">NT$ 436 萬</span>
+                </div>
+
+                <div class="flex justify-between items-center p-2.5 bg-indigo-50 rounded-lg border border-indigo-200">
+                  <div>
+                    <span class="font-semibold text-indigo-900 block">第六回合生命表</span>
+                    <span class="text-[10px] text-indigo-700">近期保單</span>
+                  </div>
+                  <span id="coi-total-6" class="text-base font-black text-indigo-900">NT$ 312 萬</span>
+                </div>
+
+                <div class="flex justify-between items-center p-2.5 bg-emerald-100 rounded-lg border border-emerald-300 ring-1 ring-emerald-400">
+                  <div>
+                    <span class="font-black text-emerald-950 block">第七回合生命表 (最新)</span>
+                    <span class="text-[10px] text-emerald-800">114/07/29 後新單</span>
+                  </div>
+                  <span id="coi-total-7" class="text-base font-black text-emerald-900">NT$ 228 萬</span>
+                </div>
+
+                <div class="pt-2 border-t border-slate-200 text-center">
+                  <span class="text-slate-600">最新七表比起四表節省高達：</span>
+                  <div id="coi-diff-highlight" class="text-lg font-black text-red-600 mt-0.5">NT$ 396 萬元 (-63.5%)</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detailed Breakdowns Table corresponding to Image 4 -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse border border-slate-200">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-700 font-semibold">
+                    <th class="p-2.5 border border-slate-200">年齡區間</th>
+                    <th class="p-2.5 border border-slate-200">階段重大事件</th>
+                    <th class="p-2.5 border border-slate-200">規劃保額</th>
+                    <th class="p-2.5 border border-slate-200 text-amber-800">第四回合 COI 累計</th>
+                    <th class="p-2.5 border border-slate-200 text-blue-800">第五回合 COI 累計</th>
+                    <th class="p-2.5 border border-slate-200 text-indigo-800">第六回合 COI 累計</th>
+                    <th class="p-2.5 border border-slate-200 text-emerald-800 bg-emerald-50">第七回合 COI (最新)</th>
+                    <th class="p-2.5 border border-slate-200 text-red-600 font-bold">新舊節省差額</th>
+                  </tr>
+                </thead>
+                <tbody id="table-coi-breakdown" class="divide-y divide-slate-200">
+                  <!-- Generated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-comparison" class="tab-content hidden space-y-6">
+          <div class="bg-gradient-to-r from-slate-900 to-blue-950 text-white p-6 rounded-2xl shadow-md border border-slate-800">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <span class="text-xs bg-blue-500/20 text-blue-300 border border-blue-500/40 px-3 py-1 rounded-full font-bold">
+                  還原附件圖1：1130118製作版
+                </span>
+                <h2 class="text-2xl font-black mt-2">『千萬身價、壽險家庭計劃』效益一覽總表</h2>
+                <p class="text-xs sm:text-sm text-slate-300 mt-1">
+                  範例試算：以 35歲男性 為例，規劃 1,000 萬責任保額，試算 30 年至 64 歲年度末之財務成果。
+                </p>
+              </div>
+              <div class="bg-blue-800/40 border border-blue-400/30 p-3 rounded-xl text-xs space-y-1 text-slate-200">
+                <div>• 終身壽險：20年期不分紅終身壽險</div>
+                <div>• 定期壽險：30年期不分紅定期壽險</div>
+                <div>• 投資型保單：變額萬能終身甲型 (預估報酬率6%)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comparison Table replicating Image 1 directly -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs sm:text-sm border-collapse">
+                <thead>
+                  <tr class="bg-slate-800 text-white font-bold text-center">
+                    <th class="p-3.5 border-r border-slate-700 w-1/5 text-left pl-4">計劃別</th>
+                    <th class="p-3.5 border-r border-slate-700 w-1/4">終身壽險『保障計劃』</th>
+                    <th class="p-3.5 border-r border-slate-700 w-1/4">定期壽險『保障計劃』</th>
+                    <th class="p-3.5 w-1/3 bg-blue-900/90 border-l-2 border-amber-400 text-amber-200">
+                      變額萬能終身壽險甲型<br><span class="text-xs text-white font-normal">『保障 & 投資計劃』</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-3.5 font-bold text-slate-700 bg-slate-50">計劃類別</td>
+                    <td class="p-3.5 text-center">20年期不分紅終身壽險</td>
+                    <td class="p-3.5 text-center">30年期不分紅定期壽險</td>
+                    <td class="p-3.5 text-center bg-blue-50/50 font-semibold text-blue-950">99@甲型投資型保單 (保障&投資)</td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-3.5 font-bold text-slate-700 bg-slate-50">保障年期</td>
+                    <td class="p-3.5 text-center">終身 (最高至105歲)</td>
+                    <td class="p-3.5 text-center">30年 (定期保障)</td>
+                    <td class="p-3.5 text-center bg-blue-50/50 font-semibold text-blue-950">最高至 99 歲</td>
+                  </tr>
+                  <tr class="bg-amber-50/40">
+                    <td class="p-3.5 font-bold text-amber-950 bg-amber-100/60">保障額度</td>
+                    <td colspan="3" class="p-3.5 text-center text-xl font-black text-slate-900 tracking-wider">
+                      1,000 萬
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-3.5 font-bold text-slate-700 bg-slate-50">每年支付保費</td>
+                    <td class="p-3.5 text-center font-bold text-red-600">343,000 元</td>
+                    <td class="p-3.5 text-center font-bold text-slate-800">61,300 元</td>
+                    <td class="p-3.5 text-center bg-blue-50/50">
+                      <div class="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded-full text-xs">
+                        <i class="fa-solid fa-trophy text-amber-500"></i> 勝
+                      </div>
+                      <div class="font-bold text-slate-900 mt-1">120,000 元，最低 55,680 元</div>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-3.5 font-bold text-slate-700 bg-slate-50">30年總支付保費</td>
+                    <td class="p-3.5 text-center font-bold text-slate-800">686 萬元 (繳20年)</td>
+                    <td class="p-3.5 text-center font-bold text-slate-800">1,839,000 元</td>
+                    <td class="p-3.5 text-center bg-blue-50/50">
+                      <div class="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded-full text-xs">
+                        <i class="fa-solid fa-trophy text-amber-500"></i> 勝
+                      </div>
+                      <div class="font-bold text-slate-900 mt-1">360 萬元，最低 167 萬元</div>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-3.5 font-bold text-slate-700 bg-slate-50">30年解約金 (64歲末)</td>
+                    <td class="p-3.5 text-center">
+                      <span class="inline-block bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded font-bold mb-1">勝 (保證)</span>
+                      <div class="font-bold text-slate-900">714.7 萬元</div>
+                    </td>
+                    <td class="p-3.5 text-center font-bold text-slate-400">0 元 (純消耗)</td>
+                    <td class="p-3.5 text-center bg-blue-50/50">
+                      <div class="font-black text-emerald-700 text-base">725.8 萬元，最低 119.5 萬元</div>
+                      <div class="text-xs text-slate-500 mt-0.5">(以預估投報率 6% 估算)</div>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-3.5 font-bold text-slate-700 bg-slate-50">30年支付保險成本</td>
+                    <td class="p-3.5 text-center">
+                      <span class="inline-block bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded font-bold mb-1">勝 (內含)</span>
+                      <div class="font-bold text-slate-900">0 萬元 (已含於保費)</div>
+                    </td>
+                    <td class="p-3.5 text-center font-bold text-red-600">1,839,000 元 (全數消耗)</td>
+                    <td class="p-3.5 text-center bg-blue-50/50 text-xs text-slate-700 space-y-1">
+                      <div><strong>1,090,749 元</strong> = 18萬(保費費用)+2.52萬(管理費)+106.55萬(危險保費)-18萬(加值回饋金)</div>
+                      <div class="text-slate-500">低保費版：1,655,321 元 = 8.35萬+3.36萬+162.17萬-8.35萬</div>
+                    </td>
+                  </tr>
+                  <tr class="bg-blue-50/30">
+                    <td class="p-3.5 font-bold text-blue-950 bg-blue-100/50">30年解約金 - 總保費<br><span class="text-xs font-normal text-slate-500">(淨回饋差額)</span></td>
+                    <td class="p-3.5 text-center font-bold text-emerald-700 text-base">+ 28.7 萬元</td>
+                    <td class="p-3.5 text-center font-bold text-red-600 text-base">- 1,839,000 元</td>
+                    <td class="p-3.5 text-center bg-blue-100/70 font-black text-emerald-800 text-lg">
+                      <div class="inline-flex items-center gap-1.5 font-bold text-emerald-800 bg-white px-2.5 py-0.5 rounded-full text-xs shadow-sm mb-1">
+                        <i class="fa-solid fa-crown text-amber-500"></i> 大勝
+                      </div>
+                      <div>+ 365.8 萬元，至 -47.5 萬元</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="p-3.5 font-bold text-slate-700 bg-slate-50">功能性比較</td>
+                    <td class="p-3.5 text-xs text-slate-600 leading-relaxed">
+                      1. 終身壽險保障，保障家庭經濟安全。<br>
+                      2. 累積解約金，做為退休金來源之一。<br>
+                      <span class="text-red-500">缺點：保費過高，多數人預算不足無法買足千萬。</span>
+                    </td>
+                    <td class="p-3.5 text-xs text-slate-600 leading-relaxed">
+                      定期壽險保障，保障家庭經濟安全。<br>
+                      <span class="text-red-500">缺點：期滿即終止，無理賠則全部保費沉沒，無任何資產累積。</span>
+                    </td>
+                    <td class="p-3.5 text-xs text-blue-950 bg-blue-50/50 leading-relaxed space-y-1">
+                      <div><strong>1. 靈活選擇各階段保障：</strong>保障可自360萬(30倍)~2,160萬(180倍)隨意調整。</div>
+                      <div><strong>2. 彈性選擇保障年期：</strong>最高至99歲。</div>
+                      <div><strong>3. 連結數百檔基金：</strong>累積靈活投資標的，盈虧自負，享有長期資本利得。</div>
+                      <div><strong>4. 保費可靈活調整高低：</strong>甚至暫時停繳，只要保單帳戶價值足夠支付保險成本，保障持續有效！</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-strategy" class="tab-content hidden space-y-6">
+          <div class="bg-gradient-to-r from-emerald-900 to-teal-900 text-white p-6 rounded-2xl shadow-md">
+            <h2 class="text-2xl font-black mb-2">二個隱藏的巨大商機：舊戶升級與雙單配置</h2>
+            <p class="text-xs sm:text-sm text-emerald-100 leading-relaxed max-w-3xl">
+              壽險在台灣銷售超過20年，許多客戶早期投保投資型保單時適用第四或第五回合生命表。
+              面對第七回合生命表的實施，掌握「危險保費暴跌」的原理，就能為客戶創造數百萬的利潤空間！
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Opportunity 1 -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-black text-lg">
+                  1
+                </div>
+                <div>
+                  <h3 class="font-bold text-slate-900 text-base">已買過投資型的舊客戶：加買或重構新單</h3>
+                  <span class="text-xs text-blue-600 font-medium">適用新生命表，保費成本大幅降價</span>
+                </div>
+              </div>
+              <ul class="text-xs sm:text-sm text-slate-600 space-y-2.5 leading-relaxed">
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                  <span><strong>舊單現狀：</strong>十幾年前買的保單適用第四回合生命表，每月扣除的危險保費較高，尤其50歲後COI加劇增加，吃掉基金淨值。</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                  <span><strong>加買/調整策略：</strong>可將舊單保額適度調降（只保留資產累積與低成本部分），並加保一張適用<strong>第七回合生命表</strong>的新投資型保單。</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                  <span><strong>核心優勢：</strong>相同千萬保額，第七回合生命表的危險保費比第四回合省下 <strong>385萬 ~ 740萬元</strong>！節省下來的成本全部留在帳戶複利滾存。</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Opportunity 2 -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg">
+                  2
+                </div>
+                <div>
+                  <h3 class="font-bold text-slate-900 text-base">年輕頂樑柱新規劃：超高槓桿 + 彈性退場</h3>
+                  <span class="text-xs text-emerald-600 font-medium">低成本建立千萬身價，防範人生突發事故</span>
+                </div>
+              </div>
+              <ul class="text-xs sm:text-sm text-slate-600 space-y-2.5 leading-relaxed">
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                  <span><strong>破除迷思：</strong>年輕人買終身壽險千萬身價一年要34.3萬，根本買不起；定期險每年6.1萬繳30年沉沒183萬全拿不回來。</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                  <span><strong>投資型破局：</strong>年繳12萬（月繳1萬）甚至更低，就能在最關鍵的30~55歲擁有千萬身價。</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+                  <span><strong>退休無負擔：</strong>60歲子女成家立業、房貸還清後，將保額調降至最低（如100萬~200萬），帳戶內累積的數百萬資產立即轉化為穩定退休金流！</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Practical Action Framework -->
+          <div class="bg-slate-100 rounded-2xl p-6 border border-slate-300 space-y-3">
+            <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-clipboard-check text-indigo-600"></i>
+              實戰保單健檢三步驟（給業務人員與保戶的執行清單）
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div class="bg-white p-3.5 rounded-xl border border-slate-200">
+                <div class="font-bold text-slate-800 mb-1">步驟一：翻開舊保單檢查生命表</div>
+                <p class="text-slate-600">調閱保單條款或年金生命表，確認是第四回合（101年以前或左右）、第五回合（110年前後）還是最新回合。</p>
+              </div>
+              <div class="bg-white p-3.5 rounded-xl border border-slate-200">
+                <div class="font-bold text-slate-800 mb-1">步驟二：測算現有危險保費扣除額</div>
+                <p class="text-slate-600">計算被保險人目前年齡下每月被扣多少 COI，是否已經進入高危險保費攀升年齡。</p>
+              </div>
+              <div class="bg-white p-3.5 rounded-xl border border-slate-200">
+                <div class="font-bold text-slate-800 mb-1">步驟三：試算新保單省下的複利成果</div>
+                <p class="text-slate-600">利用本系統第七回合費率，展示透過降低舊保單保額、加保新單後能多省下的百萬保費，轉換為長線財富！</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // --- Data structures & Assumptions based on Taiwan Experience Mortality Tables ---
+    // Approximation of Taiwan Male Annual Mortality Rate per 10,000 people (qx * 10000)
+    // 4th Table: Base (101年)
+    // 5th Table: ~30% reduction from 4th
+    // 6th Table: further reduction
+    // 7th Table (114/07/29): further 21%~30% reduction from 6th (accumulating ~60% reduction compared to 4th table)
+    
+    // Representative ages and base mortality per 1,000 people (qx * 1000) for Table 4:
+    const baseMortalityPer1000 = {
+      22: 0.75, 23: 0.77, 24: 0.80, 25: 0.83, 26: 0.87, 27: 0.90, 28: 0.93, 29: 0.98,
+      30: 1.05, 31: 1.12, 32: 1.20, 33: 1.30, 34: 1.42, 35: 1.55, 36: 1.70, 37: 1.88,
+      38: 2.08, 39: 2.30, 40: 2.55, 41: 2.82, 42: 3.12, 43: 3.45, 44: 3.82, 45: 4.22,
+      46: 4.67, 47: 5.18, 48: 5.75, 49: 6.38, 50: 7.08, 51: 7.85, 52: 8.70, 53: 9.65,
+      54: 10.70, 55: 11.85, 56: 13.12, 57: 14.50, 58: 16.02, 59: 17.70, 60: 19.55,
+      61: 21.60, 62: 23.85, 63: 26.35, 64: 29.10, 65: 32.15
+    };
+
+    // Table discount multipliers relative to Table 4
+    const tableRatios = {
+      table4: 1.00,
+      table5: 0.70,  // ~30% reduction
+      table6: 0.50,  // further reduction
+      table7: 0.365  // 21%~30% drop from 6th, overall ~63.5% drop from 4th
+    };
+
+    // User configurable stages
+    let stageCoverages = {
+      22: 200,  // 22-29
+      30: 500,  // 30-32
+      33: 700,  // 33-34
+      35: 1000, // 35-54
+      55: 300,  // 55-64
+      65: 200   // 65+
+    };
+
+    let lifeChart = null;
+    let coiChart = null;
+
+    // Helper: Determine coverage at given age
+    function getCoverageAtAge(age) {
+      if (age < 30) return stageCoverages[22];
+      if (age < 33) return stageCoverages[30];
+      if (age < 35) return stageCoverages[33];
+      if (age < 55) return stageCoverages[35];
+      if (age < 65) return stageCoverages[55];
+      return stageCoverages[65];
+    }
+
+    function calculateCOI() {
+      let cumTable4 = 0;
+      let cumTable5 = 0;
+      let cumTable6 = 0;
+      let cumTable7 = 0;
+
+      const breakdownData = [
+        { label: '22~29歲 (入社會成家前)', minAge: 22, maxAge: 29, event: '單身打拼' },
+        { label: '30~32歲 (新婚期)', minAge: 30, maxAge: 32, event: '結婚成家' },
+        { label: '33~34歲 (孩子出生)', minAge: 33, maxAge: 34, event: '育兒啟航' },
+        { label: '35~54歲 (房貸與育兒高峰)', minAge: 35, maxAge: 54, event: '家庭重擔期' },
+        { label: '55~64歲 (房貸清/子女畢業)', minAge: 55, maxAge: 64, event: '責任減輕期' }
+      ];
+
+      const stageBreakdownResults = [];
+
+      for (let segment of breakdownData) {
+        let segT4 = 0, segT5 = 0, segT6 = 0, segT7 = 0;
+        for (let age = segment.minAge; age <= segment.maxAge; age++) {
+          const qx4 = (baseMortalityPer1000[age] || 2.0) / 1000;
+          const cov = getCoverageAtAge(age) * 10000; // in NT$
+
+          const cost4 = cov * qx4 * tableRatios.table4;
+          const cost5 = cov * qx4 * tableRatios.table5;
+          const cost6 = cov * qx4 * tableRatios.table6;
+          const cost7 = cov * qx4 * tableRatios.table7;
+
+          segT4 += cost4;
+          segT5 += cost5;
+          segT6 += cost6;
+          segT7 += cost7;
+        }
+
+        cumTable4 += segT4;
+        cumTable5 += segT5;
+        cumTable6 += segT6;
+        cumTable7 += segT7;
+
+        stageBreakdownResults.push({
+          label: segment.label,
+          event: segment.event,
+          cov: getCoverageAtAge(segment.minAge),
+          t4: Math.round(segT4),
+          t5: Math.round(segT5),
+          t6: Math.round(segT6),
+          t7: Math.round(segT7),
+          diff: Math.round(segT4 - segT7)
+        });
+      }
+
+      return {
+        cumTable4: Math.round(cumTable4),
+        cumTable5: Math.round(cumTable5),
+        cumTable6: Math.round(cumTable6),
+        cumTable7: Math.round(cumTable7),
+        diff: Math.round(cumTable4 - cumTable7),
+        stageBreakdownResults
+      };
+    }
+
+    function updateUI() {
+      const results = calculateCOI();
+
+      // Update KPI
+      const diffWan = (results.diff / 10000).toFixed(0);
+      document.getElementById('kpi-saving').textContent = `約 ${diffWan} 萬元`;
+      document.getElementById('kpi-peak-coverage').textContent = stageCoverages[35].toLocaleString();
+
+      // Update Tab 2 numbers
+      document.getElementById('coi-total-4').textContent = `NT$ ${(results.cumTable4 / 10000).toFixed(1)} 萬`;
+      document.getElementById('coi-total-5').textContent = `NT$ ${(results.cumTable5 / 10000).toFixed(1)} 萬`;
+      document.getElementById('coi-total-6').textContent = `NT$ ${(results.cumTable6 / 10000).toFixed(1)} 萬`;
+      document.getElementById('coi-total-7').textContent = `NT$ ${(results.cumTable7 / 10000).toFixed(1)} 萬`;
+
+      const pctSavings = ((results.diff / results.cumTable4) * 100).toFixed(1);
+      document.getElementById('coi-diff-highlight').textContent = `NT$ ${(results.diff / 10000).toFixed(0)} 萬元 (-${pctSavings}%)`;
+
+      // Render breakdown table
+      const tbody = document.getElementById('table-coi-breakdown');
+      tbody.innerHTML = '';
+      results.stageBreakdownResults.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        tr.innerHTML = `
+          <td class="p-2.5 border border-slate-200 font-semibold text-slate-800">${item.label}</td>
+          <td class="p-2.5 border border-slate-200 text-slate-600">${item.event}</td>
+          <td class="p-2.5 border border-slate-200 font-bold text-blue-700">${item.cov} 萬</td>
+          <td class="p-2.5 border border-slate-200 text-amber-900 font-medium">${(item.t4/10000).toFixed(1)} 萬</td>
+          <td class="p-2.5 border border-slate-200 text-blue-900 font-medium">${(item.t5/10000).toFixed(1)} 萬</td>
+          <td class="p-2.5 border border-slate-200 text-indigo-900 font-medium">${(item.t6/10000).toFixed(1)} 萬</td>
+          <td class="p-2.5 border border-slate-200 text-emerald-900 font-bold bg-emerald-50/70">${(item.t7/10000).toFixed(1)} 萬</td>
+          <td class="p-2.5 border border-slate-200 text-red-600 font-black">省 ${(item.diff/10000).toFixed(1)} 萬</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Update Charts
+      updateCharts(results);
+    }
+
+    function initCharts() {
+      // 1. Life Stage Chart
+      const ctxLife = document.getElementById('lifeStageChart').getContext('2d');
+      const ages = [];
+      const coverageData = [];
+      for (let a = 22; a <= 70; a++) {
+        ages.push(a + '歲');
+        coverageData.push(getCoverageAtAge(a));
+      }
+
+      lifeChart = new Chart(ctxLife, {
+        type: 'line',
+        data: {
+          labels: ages,
+          datasets: [{
+            label: '保額 (萬元)',
+            data: coverageData,
+            borderColor: '#2563eb',
+            backgroundColor: 'rgba(37, 99, 235, 0.15)',
+            borderWidth: 3,
+            stepped: 'before',
+            fill: true,
+            pointRadius: (ctx) => {
+              const age = ctx.dataIndex + 22;
+              return [22, 30, 33, 35, 55, 65].includes(age) ? 6 : 0;
+            },
+            pointBackgroundColor: '#1d4ed8',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `保障額度: ${ctx.parsed.y} 萬元`
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: '保額 (萬元)' },
+              grid: { color: '#f1f5f9' }
+            },
+            x: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+
+      // 2. Cumulative COI Comparison Chart
+      const ctxCOI = document.getElementById('coiChart').getContext('2d');
+      const sampleAges = [25, 30, 35, 40, 45, 50, 55, 60, 65];
+      
+      coiChart = new Chart(ctxCOI, {
+        type: 'bar',
+        data: {
+          labels: ['第四回合 (101年)', '第五回合 (110年)', '第六回合', '第七回合 (114年新表)'],
+          datasets: [{
+            label: '累積危險保費成本 (萬元)',
+            data: [624, 436, 312, 228],
+            backgroundColor: [
+              'rgba(245, 158, 11, 0.85)',
+              'rgba(59, 130, 246, 0.85)',
+              'rgba(99, 102, 241, 0.85)',
+              'rgba(16, 185, 129, 0.9)'
+            ],
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `總危險保費: NT$ ${ctx.parsed.y} 萬元`
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: '累計保費成本 (NT$ 萬元)' },
+              grid: { color: '#f1f5f9' }
+            }
+          }
+        }
+      });
+    }
+
+    function updateCharts(results) {
+      if (lifeChart) {
+        const coverageData = [];
+        for (let a = 22; a <= 70; a++) {
+          coverageData.push(getCoverageAtAge(a));
+        }
+        lifeChart.data.datasets[0].data = coverageData;
+        lifeChart.update();
+      }
+
+      if (coiChart) {
+        coiChart.data.datasets[0].data = [
+          +(results.cumTable4 / 10000).toFixed(1),
+          +(results.cumTable5 / 10000).toFixed(1),
+          +(results.cumTable6 / 10000).toFixed(1),
+          +(results.cumTable7 / 10000).toFixed(1)
+        ];
+        coiChart.update();
+      }
+    }
+
+    function updateStageCoverage() {
+      stageCoverages[22] = parseInt(document.getElementById('input-stage-22').value);
+      stageCoverages[30] = parseInt(document.getElementById('input-stage-30').value);
+      stageCoverages[33] = parseInt(document.getElementById('input-stage-33').value);
+      stageCoverages[35] = parseInt(document.getElementById('input-stage-35').value);
+      stageCoverages[55] = parseInt(document.getElementById('input-stage-55').value);
+      stageCoverages[65] = parseInt(document.getElementById('input-stage-65').value);
+
+      document.getElementById('val-stage-22').textContent = stageCoverages[22] + ' 萬';
+      document.getElementById('val-stage-30').textContent = stageCoverages[30] + ' 萬';
+      document.getElementById('val-stage-33').textContent = stageCoverages[33] + ' 萬';
+      document.getElementById('val-stage-35').textContent = stageCoverages[35].toLocaleString() + ' 萬';
+      document.getElementById('val-stage-55').textContent = stageCoverages[55] + ' 萬';
+      document.getElementById('val-stage-65').textContent = stageCoverages[65] + ' 萬';
+
+      updateUI();
+    }
+
+    function resetDefaultStages() {
+      document.getElementById('input-stage-22').value = 200;
+      document.getElementById('input-stage-30').value = 500;
+      document.getElementById('input-stage-33').value = 700;
+      document.getElementById('input-stage-35').value = 1000;
+      document.getElementById('input-stage-55').value = 300;
+      document.getElementById('input-stage-65').value = 200;
+      updateStageCoverage();
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('tab-active');
+        btn.classList.add('text-slate-600');
+      });
+
+      document.getElementById(tabId).classList.remove('hidden');
+      const activeBtn = document.getElementById('btn-' + tabId);
+      activeBtn.classList.add('tab-active');
+      activeBtn.classList.remove('text-slate-600');
+
+      // Trigger resize for Chart.js when tab becomes visible
+      if (tabId === 'tab-timeline' && lifeChart) lifeChart.resize();
+      if (tabId === 'tab-tables' && coiChart) coiChart.resize();
+    }
+
+    // Window onload initializer
+    window.onload = function() {
+      initCharts();
+      updateUI();
+    };
+  </script>
+</body>
+</html>
